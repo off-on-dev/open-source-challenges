@@ -1,0 +1,41 @@
+{
+  "name": "🧪 Adventure 00 | 🔴 Expert (Phase 3 — read the chart)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/00-blind-by-design/expert",
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-blind-by-design_03-expert/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-blind-by-design_03-expert/post-start.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker"
+      ]
+    },
+    "codespaces": {
+      "openFiles": [
+        "adventures/planned/00-blind-by-design/docs/expert.md",
+        "adventures/planned/00-blind-by-design/expert/src/main/java/dev/openfeature/demo/java/demo/OpenTelemetryConfig.java",
+        "adventures/planned/00-blind-by-design/expert/src/main/java/dev/openfeature/demo/java/demo/OpenFeatureConfig.java",
+        "adventures/planned/00-blind-by-design/expert/flags.json"
+      ]
+    }
+  },
+  "forwardPorts": [8080, 3000, 4317, 4318, 9090, 3200, 8013, 8014, 8015, 8016],
+  "portsAttributes": {
+    "8080": { "label": "Spring Boot lab", "onAutoForward": "notify" },
+    "3000": { "label": "Grafana", "onAutoForward": "notify" },
+    "4317": { "label": "OTLP gRPC", "onAutoForward": "ignore" },
+    "4318": { "label": "OTLP HTTP", "onAutoForward": "ignore" },
+    "9090": { "label": "Prometheus", "onAutoForward": "ignore" },
+    "3200": { "label": "Tempo HTTP API", "onAutoForward": "ignore" },
+    "8013": { "label": "flagd gRPC eval", "onAutoForward": "ignore" },
+    "8014": { "label": "flagd management/metrics", "onAutoForward": "ignore" },
+    "8015": { "label": "flagd sync (IN_PROCESS)", "onAutoForward": "ignore" },
+    "8016": { "label": "flagd OFREP", "onAutoForward": "ignore" }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "🧪 Adventure 00 | 🟡 Intermediate (Outcome by cohort)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/00-blind-by-design/intermediate",
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-blind-by-design_02-intermediate/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/00-blind-by-design_02-intermediate/post-start.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-spring-boot-dashboard"
+      ]
+    },
+    "codespaces": {
+      "openFiles": [
+        "adventures/planned/00-blind-by-design/docs/intermediate.md",
+        "adventures/planned/00-blind-by-design/intermediate/src/main/java/dev/openfeature/demo/java/demo/OpenFeatureConfig.java",
+        "adventures/planned/00-blind-by-design/intermediate/flags.json"
+      ]
+    }
+  },
+  "forwardPorts": [8080, 8013, 8014, 8015, 8016],
+  "portsAttributes": {
+    "8080": { "label": "Lab (Spring Boot)", "onAutoForward": "notify" },
+    "8013": { "label": "flagd gRPC eval", "onAutoForward": "ignore" },
+    "8014": { "label": "flagd management/metrics", "onAutoForward": "ignore" },
+    "8015": { "label": "flagd sync (IN_PROCESS)", "onAutoForward": "ignore" },
+    "8016": { "label": "flagd OFREP", "onAutoForward": "ignore" }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

@@ -1,0 +1,69 @@
+# Multi-container devcontainer for Expert. The lab itself runs in
+# `workspace`; flagd, the Grafana LGTM stack, and the k6 loadgen run as
+# sibling services. No Docker-in-Docker — the devcontainer attaches to
+# `workspace` and the rest of the stack is already up.
+#
+# Inside `workspace`, services are reachable by service name
+# (flagd:8013, lgtm:4317, etc.). FLAGD_HOST and OTEL_EXPORTER_OTLP_ENDPOINT
+# are pre-set so the participant does not have to hard-code hostnames.
+# Codespaces also forwards each port to localhost on the host so verify.sh
+# and curl can keep using localhost:NNNN unchanged.
+
+services:
+  workspace:
+    image: mcr.microsoft.com/devcontainers/java:1-21
+    volumes:
+      - ../..:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}:cached
+    command: sleep infinity
+    environment:
+      - FLAGD_HOST=flagd
+      - FLAGD_PORT=8013
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://lgtm:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=fun-with-flags-java-spring
+      # Trial country of registration. Read by OpenFeatureConfig via
+      # System.getenv("COUNTRY") and put on the global eval context.
+      - COUNTRY=de
+
+  flagd:
+    image: ghcr.io/open-feature/flagd:latest
+    volumes:
+      - ../..:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}:ro
+    command:
+      - start
+      - --uri
+      - file:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}/adventures/planned/00-blind-by-design/expert/flags.json
+    ports:
+      - "8013:8013"
+      - "8014:8014"
+      - "8015:8015"
+      - "8016:8016"
+
+  lgtm:
+    image: grafana/otel-lgtm:latest
+    ports:
+      - "3000:3000"     # Grafana UI (admin / admin)
+      - "4317:4317"     # OTLP gRPC
+      - "4318:4318"     # OTLP HTTP
+      - "9090:9090"     # Prometheus query API (verify.sh)
+      - "3200:3200"     # Tempo HTTP API (verify.sh)
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ../..:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}:ro
+      - ../../adventures/planned/00-blind-by-design/expert/dashboards:/otel-lgtm/grafana/dashboards:ro
+
+  loadgen:
+    image: grafana/k6:latest
+    command: ["run", "--quiet", "/scripts/script.js"]
+    volumes:
+      - ../../adventures/planned/00-blind-by-design/expert/loadgen/k6:/scripts:ro
+    environment:
+      # The script idles while loadgen_active is "off". Flip it in flags.json
+      # to start hammering the lab.
+      - BASE_URL=http://workspace:8080
+      - FLAGD_URL=http://flagd:8013
+    restart: unless-stopped
+    depends_on:
+      - flagd

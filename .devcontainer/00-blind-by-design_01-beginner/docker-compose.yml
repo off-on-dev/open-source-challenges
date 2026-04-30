@@ -1,0 +1,40 @@
+# Multi-container devcontainer for Beginner. The lab itself runs in
+# `workspace`; flagd runs as a sibling so participants meet the realistic
+# shape ("the SDK talks RPC to a separate flag service") from level 1
+# instead of running file-mode in-process and throwing it away for
+# Intermediate.
+#
+# Both services bind-mount the same workspace at the same path. flagd
+# watches the participant's flags.json directly — edit it in the IDE,
+# the file watcher reloads, the next request sees the new variant.
+
+services:
+  workspace:
+    image: mcr.microsoft.com/devcontainers/java:1-21
+    volumes:
+      - ../..:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}:cached
+    command: sleep infinity
+    environment:
+      # The flagd Java provider reads these env vars by default when
+      # FlagdOptions.builder() is invoked without an explicit host/port.
+      # Pre-set so a vanilla `Resolver.RPC` config Just Works inside the
+      # devcontainer — and a participant who runs the lab from their host
+      # machine after `docker compose up flagd` will hit `localhost:8013`
+      # via the published port.
+      - FLAGD_HOST=flagd
+      - FLAGD_PORT=8013
+
+  flagd:
+    image: ghcr.io/open-feature/flagd:latest
+    container_name: side-effects-beginner-flagd
+    volumes:
+      - ../..:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}:ro
+    command:
+      - start
+      - --uri
+      - file:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}/adventures/planned/00-blind-by-design/beginner/flags.json
+    ports:
+      - "8013:8013"
+      - "8014:8014"
+      - "8015:8015"
+      - "8016:8016"

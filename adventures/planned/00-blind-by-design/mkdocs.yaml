@@ -1,0 +1,11 @@
+site_name: '🧪  00: Blind by Design'
+
+nav:
+  - Introduction: index.md
+  - '🟢 Beginner': beginner.md
+  - '🟡 Intermediate': intermediate.md
+  - '🔴 Expert': expert.md
+  - 'Solutions':
+      - '🟢 Beginner': solutions/beginner.md
+      - '🟡 Intermediate': solutions/intermediate.md
+      - '🔴 Expert': solutions/expert.md

@@ -1,0 +1,41 @@
+# Multi-container devcontainer for Intermediate. The lab itself runs in
+# `workspace`; flagd runs as a sibling so participants who finish the
+# FILE-mode path early can flip the FlagdProvider to RPC mode and talk
+# to flagd:8013 without any Docker-in-Docker dance.
+#
+# Both services bind-mount the same workspace at the same path. flagd
+# watches the participant's flags.json directly — edit it in the IDE,
+# the file watcher reloads.
+
+services:
+  workspace:
+    image: mcr.microsoft.com/devcontainers/java:1-21
+    volumes:
+      - ../..:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}:cached
+    command: sleep infinity
+    environment:
+      # Pre-set FLAGD_HOST so participants who switch to RPC mode in
+      # OpenFeatureConfig do not have to hard-code the hostname.
+      - FLAGD_HOST=flagd
+      - FLAGD_PORT=8013
+      # The trial's country of registration. Used by OpenFeatureConfig
+      # via System.getenv("COUNTRY") to populate the global eval context.
+      # `de` by default so F5 / Spring Boot Dashboard runs already exercise
+      # the country-targeting branch. Override with run-austria.sh or
+      # `COUNTRY=at ./mvnw spring-boot:run` to flip.
+      - COUNTRY=de
+
+  flagd:
+    image: ghcr.io/open-feature/flagd:latest
+    container_name: side-effects-intermediate-flagd
+    volumes:
+      - ../..:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}:ro
+    command:
+      - start
+      - --uri
+      - file:/workspaces/${localWorkspaceFolderBasename:-open-ecosystem-challenges}/adventures/planned/00-blind-by-design/intermediate/flags.json
+    ports:
+      - "8013:8013"
+      - "8014:8014"
+      - "8015:8015"
+      - "8016:8016"

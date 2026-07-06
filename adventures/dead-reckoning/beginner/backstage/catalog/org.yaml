@@ -1,0 +1,49 @@
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-user
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: guest
+spec:
+  memberOf: [guests]
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-group
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: guests
+spec:
+  type: team
+  children: []
+---
+# The squadrons that crew and answer for the fleet's vessels. The commissioning
+# template's OwnerPicker lists these (it filters on spec.type: squadron).
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: windward
+  title: Windward
+  description: Holds the weather gauge and leads the fleet into the wind.
+spec:
+  type: squadron
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: leeward
+  title: Leeward
+  description: Guards the sheltered flank and shepherds the supply train.
+spec:
+  type: squadron
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: vanguard
+  title: Vanguard
+  description: Sails ahead of the fleet to scout and screen.
+spec:
+  type: squadron
+  children: []

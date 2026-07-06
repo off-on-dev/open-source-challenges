@@ -1,0 +1,35 @@
+gitea:
+  admin:
+    username: admin
+    password: a-super-secure-password
+    email: gitea@local
+  config:
+    database:
+      DB_TYPE: sqlite3
+    server:
+      ROOT_URL: http://gitea-http.gitea.svc.cluster.local:3000
+    webhook:
+      ALLOWED_HOST_LIST: "*"
+
+service:
+  http:
+    type: NodePort
+    nodePort: 30110
+
+# Disable persistence and use SQLite to keep the setup lightweight
+persistence:
+  enabled: false
+
+postgresql-ha:
+  enabled: false
+
+postgresql:
+  enabled: false
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: 500m

@@ -1,0 +1,25 @@
+slug: dead-reckoning
+name: "Dead Reckoning"
+emoji: "🧭"
+
+tags:
+  - Backstage
+  - Gitea
+  - Argo Workflows
+  - Argo CD
+  - OpenTelemetry
+  - Jaeger
+
+backstory:
+  - >-
+    The Grand Fleet's commission office is buried in complaints. Manifests are filed but nothing comes of them.
+    Vessels that do sail arrive at port with the wrong cargo, and no one along the route can explain why. As the
+    fleet's engineer, your mission is to restore order from keel to quayside and find out what the records are hiding.
+
+rewards:
+  deadline: "Tuesday, 28 July 2026 at 23:59 CET"
+  tiers:
+    - label: "1st place"
+      description: "Credly badge to showcase the achievement"
+    - label: "Top 3"
+      description: "Credly badge to showcase the achievement"

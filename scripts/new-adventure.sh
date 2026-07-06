@@ -23,28 +23,24 @@ selected_level=$(echo "$level_lines" | gum choose --header "Which level do you w
 
 parse_level_heading "$selected_level"
 
-# position of selected level among ### headings (1st = 01, 2nd = 02, ...)
-level_number=$(echo "$level_lines" \
-  | awk -v target="$selected_level" '{n++; if ($0 == target) {printf "%02d", n; exit}}')
-
 echo ""
 echo "Adventure : $adventure_emoji $adventure_name ($selected_slug)"
 echo "Level     : $level_emoji  $level_difficulty: $level_name"
-echo "Slug      : $level_slug (level $level_number)"
+echo "Slug      : $level_slug"
 echo ""
 
 # ─── Scaffold adventure base ──────────────────────────────────────────────────
 
-ADVENTURE_DIR="$REPO_ROOT/adventures/planned/00-$selected_slug"
+ADVENTURE_DIR="$REPO_ROOT/adventures/planned/$selected_slug"
 adventure_technologies=$(extract_overview_field "$selected_file" "Technologies")
 adventure_theme=$(extract_overview_field "$selected_file" "Theme")
 
 if [[ ! -d "$ADVENTURE_DIR" ]]; then
-  echo "Creating adventure base at adventures/planned/00-$selected_slug/ ..."
+  echo "Creating adventure base at adventures/planned/$selected_slug/ ..."
   mkdir -p "$ADVENTURE_DIR/docs"
 
   cat > "$ADVENTURE_DIR/README.md" << EOF
-# $adventure_emoji Adventure 00: $adventure_name
+# $adventure_emoji $adventure_name
 
 $adventure_theme
 
@@ -182,15 +178,15 @@ SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "\$SCRIPT_DIR/../../../../lib/scripts/loader.sh"
 
-set_tracking_context "$selected_slug" "$level_slug" "00" "TODO" "TODO"
+set_tracking_context "$selected_slug" "$level_slug" "" "TODO" "TODO"
 
 OBJECTIVE="$level_objective"
 
 DOCS_URL="https://offon.dev/adventures/$selected_slug/levels/$level_slug"
 
 print_header \\
-  'Challenge 00: $adventure_name' \\
-  'Level $level_number: $level_name' \\
+  '$adventure_name' \\
+  '$level_name' \\
   'Verification'
 
 # Init test counters
@@ -229,7 +225,7 @@ print_header "Test Results Summary"
 print_success "✅ PASSED: All \$TESTS_PASSED verification checks passed!"
 print_new_line
 
-check_submission_readiness "00-$selected_slug" "$level_slug"
+check_submission_readiness "$selected_slug" "$level_slug"
 EOF
 
   chmod +x "$VERIFY_SCRIPT"
@@ -240,7 +236,7 @@ fi
 
 # ─── Scaffold devcontainer ────────────────────────────────────────────────────
 
-DEVCONTAINER_NAME="00-${selected_slug}_${level_number}-${level_slug}"
+DEVCONTAINER_NAME="${selected_slug}_${level_slug}"
 DEVCONTAINER_DIR="$REPO_ROOT/.devcontainer/$DEVCONTAINER_NAME"
 
 if [[ ! -d "$DEVCONTAINER_DIR" ]]; then
@@ -249,9 +245,9 @@ if [[ ! -d "$DEVCONTAINER_DIR" ]]; then
 
   cat > "$DEVCONTAINER_DIR/devcontainer.json" << EOF
 {
-  "name": "$adventure_emoji Adventure 00 | $level_emoji $level_difficulty ($level_name)",
+  "name": "$adventure_emoji $adventure_name | $level_emoji $level_difficulty ($level_name)",
   "image": "mcr.microsoft.com/devcontainers/base:bullseye",
-  "workspaceFolder": "/workspaces/\${localWorkspaceFolderBasename}/adventures/planned/00-$selected_slug/$level_slug",
+  "workspaceFolder": "/workspaces/\${localWorkspaceFolderBasename}/adventures/planned/$selected_slug/$level_slug",
   "features": {
     // TODO: add required features (e.g. "ghcr.io/devcontainers/features/docker-in-docker:2": {})
   },
@@ -260,7 +256,7 @@ if [[ ! -d "$DEVCONTAINER_DIR" ]]; then
   "customizations": {
     "codespaces": {
       "openFiles": [
-        "adventures/planned/00-$selected_slug/README.md"
+        "adventures/planned/$selected_slug/README.md"
       ],
       "permissions": {
         "codespaces": "write"
@@ -285,7 +281,7 @@ REPO_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # shellcheck disable=SC1091
 source "\$REPO_ROOT/lib/scripts/tracker.sh"
-set_tracking_context "$selected_slug" "$level_slug" "00" "TODO" "TODO"
+set_tracking_context "$selected_slug" "$level_slug" "" "TODO" "TODO"
 track_container_created
 
 "\$REPO_ROOT/lib/shared/init.sh" --version v0.17.0
@@ -308,7 +304,7 @@ EOF
 set -e
 
 REPO_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/../.." && pwd)"
-CHALLENGE_DIR="\$REPO_ROOT/adventures/planned/00-$selected_slug/$level_slug"
+CHALLENGE_DIR="\$REPO_ROOT/adventures/planned/$selected_slug/$level_slug"
 
 echo "✨ Starting $adventure_name - $level_difficulty Level"
 
@@ -316,7 +312,7 @@ echo "✨ Starting $adventure_name - $level_difficulty Level"
 
 # shellcheck disable=SC1091
 source "\$REPO_ROOT/lib/scripts/tracker.sh"
-set_tracking_context "$selected_slug" "$level_slug" "00" "TODO" "TODO"
+set_tracking_context "$selected_slug" "$level_slug" "" "TODO" "TODO"
 track_container_initialized
 EOF
 
@@ -334,7 +330,7 @@ gum style \
   "$(gum style --foreground 212 --bold "🎉  $adventure_emoji  $adventure_name | $level_emoji  $level_difficulty is ready!")" \
   "" \
   "Search for TODO in the generated files and fill them in:" \
-  "  adventures/planned/00-$selected_slug/" \
+  "  adventures/planned/$selected_slug/" \
   "  .devcontainer/$DEVCONTAINER_NAME/" \
   "" \
   "$(gum style --foreground 245 "Need help? Check the contributing guide:")" \

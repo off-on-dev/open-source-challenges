@@ -1,0 +1,130 @@
+level: beginner
+emoji: "🟢"
+title: "Laying the Keel"
+devcontainer: dead-reckoning_beginner
+community_url: "" # TODO: add community thread URL once the adventure is live
+
+summary: "Fix a broken Backstage software template so the commission office can register new vessels for service."
+
+audience: >-
+  Platform engineers, developers, and anyone curious about internal developer platforms and self-service
+  scaffolding. No prior Backstage experience is needed, but familiarity with YAML and basic Git concepts will help.
+
+backstory:
+  - >-
+    The commission office has been open for weeks, but nothing is being processed. Captains submit their manifests
+    to register a new vessel, wait, and hear nothing back. No repository of record ever appears in the archives, and
+    the vessel never makes it into the fleet registry.
+  - >-
+    The commissioning procedure is supposed to be routine: take a captain's request, open a fresh set of records for
+    the vessel in the archives, and enter the new ship into the registry so the rest of the yards can pick up the
+    work. Somewhere in that procedure, a step is misconfigured, and every commission fails before it completes.
+  - >-
+    Your mission: repair the vessel commissioning procedure so the office can register new vessels again, from the
+    captain's request all the way to a proper entry in the registry.
+
+objective:
+  - >-
+    Choose the owning squadron from a picker of the catalog's squadrons, instead of typing it in by hand
+  - >-
+    Commission a vessel end to end: file its repository at the location picked in the form (not a hardcoded
+    path) so the new service is registered in the Backstage catalog
+  - >-
+    Finish with a working link from the result to the new component in the catalog
+
+what_you_learn:
+  - >-
+    How Backstage [software templates](https://backstage.io/docs/features/software-templates/writing-templates)
+    are structured: parameters, steps, and output
+  - >-
+    How scaffolder
+    [actions](https://backstage.io/docs/features/software-templates/builtin-actions) work, such as `fetch:template`,
+    `publish:gitea`, and `catalog:register`
+  - >-
+    How the [catalog registration](https://backstage.io/docs/features/software-catalog/life-of-an-entity) step
+    connects a scaffolded repository to the Backstage catalog
+  - >-
+    How to use Backstage's built-in [template tooling](https://backstage.io/docs/features/software-templates/):
+    the installed-actions browser and the Template Editor's live preview and dry-run
+
+architecture:
+  - >-
+    A Backstage software template mirrors the story's commissioning chain: it gathers input, then runs scaffolder
+    steps that render the service's files (`fetch:template`), create and push a repository in Gitea
+    (`publish:gitea`), and register the new component in the catalog (`catalog:register`). If one step is
+    misconfigured, the whole commission fails.
+  - >-
+    All infrastructure is pre-provisioned, with nothing to install. **Gitea** (the archives) runs in a Kubernetes 
+    cluster on port 30110; **Backstage** (the commission office) runs alongside as a standalone instance on port 3000, 
+    already wired to Gitea.
+  - >-
+    Good news: you can trust the platform. The Backstage app and its configuration, Gitea, and the cluster are all
+    set up correctly, so you can leave them be. The bug lives in the **vessel commissioning template**, and that is
+    the only thing you need to touch.
+  - >-
+    Note: this Backstage has been trimmed to just what the challenge needs (the catalog and the scaffolder), so it
+    is deliberately lighter than a full install. If some Backstage page or feature you would expect is missing,
+    that is why.
+
+how_to_play:
+  - id: start
+    title: "Open the Commission Office"
+    content: |
+      Start Backstage with `make backstage`. The first run compiles for ~30-60s; once it's up, the
+      commission office is available in your browser on port 3000. Leave it running: you'll see the
+      logs in that terminal, and can restart any time with Ctrl-C then `make backstage`.
+  - id: explore
+    title: "Explore the Setup"
+    content: |
+      In the office (Backstage), go to **Create**: you'll find the **Commission a Vessel** template.
+      Try running it: it won't get far, and that's expected. The template is broken, and your job is
+      to repair it.
+
+      Backstage ships two built-in tools that make working on templates much easier. Reach them
+      by adding the path to your Backstage URL:
+
+      - **Installed Actions** (`/create/actions`): every scaffolder action with its inputs and
+        outputs. Handy for understanding what a step such as `publish:gitea` actually expects.
+      - **Template Editor** (`/create/edit`): load the vessel commissioning template, edit it
+        with a live preview of the form, and dry-run it without creating anything real.
+
+      Open **Gitea** on port 30110 (the archives) and the Backstage **catalog** to see what does,
+      and doesn't, make it through when you run the template.
+  - id: fix
+    title: "Repair the Template"
+    content: |
+      The only file you need to edit is the vessel commissioning template:
+
+      ```
+      backstage/templates/vessel-commissioning/template.yaml
+      ```
+
+      Read it from top to bottom. Its three sections, **parameters** (the form), **steps** (the
+      commissioning procedure), and **output** (what the captain sees at the end), each have a
+      📖 documentation link above them. Compare each section against the [Objective](#objective):
+      the form, the steps, and the output each have something to put right.
+
+      The fastest way to work is the **Template Editor** (open `/create/edit` on your Backstage
+      URL): point it at the template and it reloads your edits **instantly**, with a live preview
+      of the form and a dry-run, so you never have to restart Backstage between attempts. (Running
+      the template from **Create** instead uses the copy in Backstage's catalog, which re-reads the
+      file on its own after a short delay.)
+
+      Make your changes, try again, and once a vessel commissions cleanly, check your work.
+      Keep Backstage running in its terminal while you do: `make verify` commissions a test
+      vessel through it to confirm the repair.
+
+      ```bash
+      make verify
+      ```
+
+helpful_links:
+  - title: "Backstage Software Templates"
+    url: "https://backstage.io/docs/features/software-templates/"
+    description: "Overview of the scaffolder and how self-service templates work in Backstage"
+  - title: "Writing Templates"
+    url: "https://backstage.io/docs/features/software-templates/writing-templates"
+    description: "How a template's parameters, steps, and output fit together: the structure you'll be fixing"
+  - title: "Built-in Scaffolder Actions"
+    url: "https://backstage.io/docs/features/software-templates/builtin-actions"
+    description: "Reference for the actions a template can run, including publish and catalog registration steps"

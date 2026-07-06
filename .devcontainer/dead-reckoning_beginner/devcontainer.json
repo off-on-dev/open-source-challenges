@@ -1,0 +1,41 @@
+{
+  "name": "🧭 Dead Reckoning | 🟢 Beginner (Laying the Keel)",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/dead-reckoning/beginner",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/dead-reckoning_beginner/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/dead-reckoning_beginner/post-start.sh",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "adventures/dead-reckoning/README.md"
+      ],
+      "permissions": {
+        "codespaces": "write"
+      }
+    }
+  },
+  "forwardPorts": [3000, 7007, 30110],
+  "portsAttributes": {
+    "3000": {
+      "label": "Backstage",
+      "onAutoForward": "notify"
+    },
+    "7007": {
+      "label": "Backstage Backend",
+      "onAutoForward": "silent"
+    },
+    "30110": {
+      "label": "Gitea",
+      "onAutoForward": "notify"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

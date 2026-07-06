@@ -1,0 +1,135 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: vessel-commissioning
+  title: Commission a Vessel
+  description: >-
+    Register a new vessel with the Grand Fleet: draft its papers, open a
+    repository for it in the archives, and enter it into the fleet registry.
+  tags:
+    - go
+    - vessel
+spec:
+  owner: guests
+  type: service
+
+  # The commission office form. Each parameters entry is one page of the wizard.
+  # 📖 Form fields and pickers (OwnerPicker, EntityPicker, RepoUrlPicker, ...):
+  #    https://backstage.io/docs/features/software-templates/writing-templates/#specparameters---formstep--formstep
+  parameters:
+    - title: Vessel Details
+      required:
+        - name
+        - lifecycle
+        - description
+      properties:
+        name:
+          title: Name
+          type: string
+          description: The vessel's registry name in lowercase kebab-case (e.g. hms-nyx)
+          pattern: '^[a-z][a-z0-9-]*[a-z0-9]$'
+          ui:autofocus: true
+        # The enum values are the real Backstage lifecycle values; enumNames give
+        # them nautical labels in the form. The chosen value flows into
+        # spec.lifecycle on the vessel's catalog entry.
+        lifecycle:
+          title: Status
+          type: string
+          default: production
+          enum:
+            - experimental
+            - production
+            - deprecated
+          enumNames:
+            - Sea Trials
+            - In Service
+            - Mothballed
+        description:
+          title: Description
+          type: string
+          description: A short description of the vessel and its purpose
+          ui:widget: textarea
+          ui:options:
+            rows: 4
+
+    - title: Fleet Assignment
+      required:
+        - owner
+        - system
+      properties:
+        owner:
+          title: Owning Squadron
+          type: string
+          description: The squadron responsible for the vessel
+        system:
+          title: Fleet
+          type: string
+          description: The fleet this vessel sails with
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind: System
+
+    - title: Archive Location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          description: Where in the archives to open the vessel's repository
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - localhost:30110
+            allowedOwners:
+              - fleet
+
+  # The commissioning procedure, run step by step in the scaffolder backend.
+  # 📖 Scaffolder actions and their inputs/outputs (fetch:template, publish:gitea, catalog:register):
+  #    https://backstage.io/docs/features/software-templates/builtin-actions
+  steps:
+    # Draft the vessel's papers: render the service files from ./content, passing
+    # in every value the papers need to fill themselves out.
+    - id: fetch-base
+      name: Draft the vessel's papers
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          lifecycle: ${{ parameters.lifecycle }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+
+    # Open a repository in the archives: create the Gitea repo at the chosen
+    # location and push the papers.
+    - id: publish
+      name: File in the archives
+      action: publish:gitea
+      input:
+        description: ${{ parameters.description }}
+        defaultBranch: main
+
+    # Enter the vessel into the fleet registry: register it in the catalog.
+    - id: register
+      name: Enter into the registry
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        # Relative (no leading slash) on purpose: a leading slash makes Gitea's
+        # resolveUrl mis-parse the /src/branch/<branch>/ path and drop the branch.
+        catalogInfoPath: catalog-info.yaml
+
+  # Shown to the captain once the vessel is commissioned.
+  # 📖 Outputs, and referencing a step's outputs with ${{ steps... }}:
+  #    https://backstage.io/docs/features/software-templates/writing-templates/#outputs
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in registry
+        icon: catalog
+        entityRef: ${{ todo }}

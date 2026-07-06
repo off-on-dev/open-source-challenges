@@ -1,0 +1,118 @@
+app:
+  title: Scaffolded Backstage App
+  baseUrl: http://localhost:3000
+
+  # Enable all packages by default, this will discover packages from packages/app/package.json
+  packages: all
+
+  extensions:
+    # Configure the catalog index page to be the root page, this is normally mounted on /catalog
+    - page:catalog:
+        config:
+          path: /
+
+organization:
+  name: My Company
+
+backend:
+  auth:
+    # This is a throwaway, single-user challenge environment. Disabling the
+    # default auth policy lets local tooling (the verify script) call the
+    # scaffolder and catalog APIs without a token. Paired with
+    # permission.enabled: false below. Do not copy this into a real deployment.
+    dangerouslyDisableDefaultAuthPolicy: true
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+    # Uncomment the following host directive to bind to specific interfaces
+    # host: 127.0.0.1
+  csp:
+    connect-src: ["'self'", 'http:', 'https:']
+    # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
+    # Default Helmet Content-Security-Policy values can be removed by setting the key to false
+  cors:
+    origin: http://localhost:3000
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  # In-memory SQLite: the catalog is rebuilt on every start, which is all this
+  # challenge needs.
+  database:
+    client: better-sqlite3
+    connection: ':memory:'
+  # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
+
+integrations:
+  # Gitea runs in-cluster and is exposed on the NodePort below. Backstage talks
+  # to it with basic auth using the admin credentials provisioned by the Gitea
+  # Helm chart, so the scaffolder's publish:gitea action can create repositories.
+  # baseUrl must be set explicitly: without it the integration defaults to
+  # https://<host>, but Gitea serves plain HTTP here (ERR_SSL_WRONG_VERSION_NUMBER).
+  gitea:
+    - host: localhost:30110
+      baseUrl: http://localhost:30110
+      username: admin
+      password: a-super-secure-password
+
+auth:
+  # see https://backstage.io/docs/auth/ to learn about auth providers
+  providers:
+    # See https://backstage.io/docs/auth/guest/provider
+    guest: {}
+  # see https://backstage.io/docs/ai/mcp-actions#client-id-metadata-documents
+  # to learn more about client id metadata documents
+  experimentalClientIdMetadataDocuments:
+    enabled: false
+    # Optional: restrict which `client_id` URLs are allowed (defaults to ['*'])
+    # allowedClientIdPatterns:
+    #   - 'https://example.com/*'
+    #   - 'https://*.trusted-domain.com/*'
+    # Optional: restrict which redirect URIs are allowed (defaults to ['*'])
+    # allowedRedirectUriPatterns:
+    #   - 'http://localhost:*'
+    #   - 'https://*.example.com/*'
+
+scaffolder:
+  # see https://backstage.io/docs/features/software-templates/configuration for software template options
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, API, Resource, Location]
+  locations:
+    # The vessel commissioning template. File locations are relative to the
+    # backend process, typically `packages/backend`.
+    - type: file
+      target: ../../templates/vessel-commissioning/template.yaml
+      rules:
+        - allow: [Template]
+
+    # Organizational data: the guest user, and the squadron groups the
+    # OwnerPicker offers as owners.
+    - type: file
+      target: ../../catalog/org.yaml
+      rules:
+        - allow: [User, Group]
+
+    # The fleets a vessel can be assigned to, offered by the EntityPicker.
+    - type: file
+      target: ../../catalog/fleet.yaml
+      rules:
+        - allow: [System]
+
+    ## Uncomment these lines to add more example data
+    # - type: url
+    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
+
+    ## Uncomment these lines to add an example org
+    # - type: url
+    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
+    #   rules:
+    #     - allow: [User, Group]
+
+# see https://backstage.io/docs/permissions/getting-started for more on the permission framework
+permission:
+  # Disabled so the verify script can read the catalog and run the scaffolder
+  # without a permission token. See backend.auth above.
+  enabled: false

@@ -1,0 +1,133 @@
+level: beginner
+emoji: "🟢"
+title: "The Initial Audit"
+devcontainer: adventure-accessibility-nightmare_beginner
+community_url: "" # TODO: add community thread URL once the adventure is live
+
+summary: >-
+  Audit the ShopSmart homepage and fix critical WCAG 2.2 accessibility
+  violations before the initial compliance review.
+
+audience: >-
+  Frontend developers who understand basic HTML, CSS, React, and browser
+  developer tools but are new to systematic accessibility testing.
+
+backstory:
+  - >-
+    ShopSmart has received an urgent legal notice about accessibility barriers
+    on its public storefront.
+  - >-
+    Customers cannot reliably navigate the page by keyboard, important images
+    have no text alternatives, several controls use incorrect semantics, and
+    the visual design does not meet WCAG contrast requirements.
+  - >-
+    Your task is to audit the homepage, understand the failures, and repair the
+    most serious problems before regulators escalate the case.
+
+objective:
+  - >-
+    Remove all serious and critical axe-core violations from the ShopSmart homepage.
+  - >-
+    Provide meaningful alternative text for every informative image.
+  - >-
+    Ensure the menu and primary call-to-action are semantic, keyboard-focusable controls.
+  - >-
+    Add visible focus indicators for interactive elements.
+  - >-
+    Achieve a Lighthouse accessibility score of at least 95.
+
+what_you_learn:
+  - >-
+    How to interpret automated axe-core accessibility reports.
+  - >-
+    How semantic HTML affects keyboard and assistive-technology behavior.
+  - >-
+    How to identify and correct WCAG color-contrast failures.
+  - >-
+    How to provide useful text alternatives for images.
+  - >-
+    How to verify accessibility outcomes with Playwright and Lighthouse.
+
+architecture:
+  - >-
+    A React and Vite storefront runs on port 5173 inside the Dev Container.
+  - >-
+    Playwright launches Chromium and uses axe-core to scan the rendered homepage.
+  - >-
+    Lighthouse CI measures the accessibility category and requires a score of 95 or higher.
+  - >-
+    Players edit src/App.jsx and src/styles.css. The tests and verification
+    scripts define the required outcomes and should not be weakened or bypassed.
+
+architecture_diagram: ""
+
+toolbox:
+  - name: "axe-core"
+    url: "https://github.com/dequelabs/axe-core"
+    description: "Automated accessibility engine used to detect WCAG violations."
+  - name: "Playwright"
+    url: "https://playwright.dev/"
+    description: "Browser automation framework used for accessibility and keyboard tests."
+  - name: "Lighthouse"
+    url: "https://developer.chrome.com/docs/lighthouse/"
+    description: "Browser audit tool used to measure the final accessibility score."
+  - name: "WCAG 2.2"
+    url: "https://www.w3.org/TR/WCAG22/"
+    description: "Accessibility standard that defines the success criteria for this level."
+
+services:
+  - name: "ShopSmart"
+    url: "http://localhost:5173"
+    description: "The intentionally inaccessible React storefront."
+
+how_to_play:
+  - id: explore
+    title: "Explore the Broken Storefront"
+    content: |
+      Open ShopSmart on port 5173 and navigate the page using only the keyboard.
+
+      Run the automated checks:
+
+      ```bash
+      npm run test:a11y
+      npm run test:lighthouse
+      ```
+
+      Review the reported axe rule IDs, affected elements, keyboard failures,
+      and Lighthouse score before changing the implementation.
+
+  - id: implement
+    title: "Repair the Accessibility Failures"
+    content: |
+      Work primarily in:
+
+      ```text
+      src/App.jsx
+      src/styles.css
+      ```
+
+      Correct the semantic controls, image alternatives, contrast problems,
+      keyboard behavior, and focus appearance.
+
+      Do not remove tests, lower score thresholds, disable axe rules, or weaken
+      the verification logic.
+
+      When ready, run:
+
+      ```bash
+      ./verify.sh
+      ```
+
+helpful_links:
+  - title: "Understanding WCAG 2.2"
+    url: "https://www.w3.org/WAI/WCAG22/Understanding/"
+    description: "Plain-language explanations of the relevant WCAG success criteria."
+  - title: "axe-core Playwright integration"
+    url: "https://playwright.dev/docs/accessibility-testing"
+    description: "Guidance for running axe accessibility scans in Playwright."
+  - title: "Keyboard accessibility"
+    url: "https://www.w3.org/WAI/WCAG22/Understanding/keyboard"
+    description: "Explains why functionality must be available from a keyboard."
+  - title: "Focus appearance"
+    url: "https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance"
+    description: "Explains the WCAG 2.2 requirements for visible keyboard focus."

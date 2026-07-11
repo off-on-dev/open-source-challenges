@@ -1,0 +1,183 @@
+:root {
+    font-family:
+        Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #2f2f2f;
+    background: #f7f7fb;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+a,
+.menu,
+.primary-action {
+    outline: none;
+}
+
+.page {
+    min-height: 100vh;
+}
+
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 5vw;
+    background: #ffffff;
+    border-bottom: 1px solid #e8e8ef;
+}
+
+.logo {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-right: auto;
+}
+
+.menu,
+.primary-action,
+.buy-button {
+    cursor: pointer;
+}
+
+.menu {
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+    background: #ececf4;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.25rem;
+}
+
+.nav-links a {
+    color: #9c9ca8;
+}
+
+.hero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    min-height: 520px;
+    padding: 4rem 5vw;
+    background: #fff7f1;
+}
+
+.hero img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 1.25rem;
+}
+
+.eyebrow {
+    margin: 0 0 0.75rem;
+    color: #d5a093;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+h1 {
+    max-width: 12ch;
+    margin: 0;
+    font-size: clamp(2.4rem, 6vw, 4.8rem);
+    line-height: 1;
+}
+
+.hero-copy {
+    max-width: 52ch;
+    color: #b5a9a3;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.primary-action {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.9rem 1.4rem;
+    border-radius: 0.65rem;
+    background: #f0b4a5;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.products-section {
+    padding: 4rem 5vw;
+}
+
+.products-section h2 {
+    margin-top: 0;
+    font-size: 2rem;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.product-card {
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 12px 30px rgb(20 20 40 / 8%);
+}
+
+.product-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 0.75rem;
+}
+
+.product-card p {
+    color: #a8a8b2;
+    line-height: 1.6;
+}
+
+.buy-button {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 0;
+    border-radius: 0.6rem;
+    background: #d8d8e2;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+footer {
+    padding: 2rem 5vw;
+    color: #aaaab4;
+    text-align: center;
+}
+
+@media (max-width: 800px) {
+    .site-header {
+        flex-wrap: wrap;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .hero,
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+}

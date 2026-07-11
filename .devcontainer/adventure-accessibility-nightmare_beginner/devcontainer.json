@@ -1,0 +1,35 @@
+{
+  "name": "♿ The Accessibility Nightmare | 🟢 Beginner (The Initial Audit)",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/adventure-accessibility-nightmare/beginner",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_beginner/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_beginner/post-start.sh",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "adventures/planned/adventure-accessibility-nightmare/README.md"
+      ],
+      "permissions": {
+        "codespaces": "write"
+      }
+    }
+  },
+  "forwardPorts": [
+    5173
+  ],
+  "portsAttributes": {
+    "5173": {
+      "label": "ShopSmart",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

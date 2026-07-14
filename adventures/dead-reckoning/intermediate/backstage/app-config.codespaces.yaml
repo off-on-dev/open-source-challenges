@@ -1,0 +1,42 @@
+# Config overlay applied only when Backstage runs inside a GitHub Codespace.
+# Codespaces forwards each port at https://<codespace>-<port>.<forwarding-domain>.
+# The backend baseUrl must be this public URL so the browser SPA can reach it
+# (localhost:7007 is not reachable from the browser), and cors.origin must match
+# the public frontend URL. app.baseUrl deliberately stays as localhost (from the
+# base config) so the dev server still binds to localhost:3000; the port-forward
+# exposes it to the browser.
+backend:
+  baseUrl: https://${CODESPACE_NAME}-7007.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+  cors:
+    origin: https://${CODESPACE_NAME}-3000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+
+# In a Codespace, localhost:30112 is not reachable from the browser, so every
+# Gitea URL Backstage generates (repo links, catalog source location) must use
+# the public forwarded URL instead. The base app-config.yaml keeps localhost, so
+# local dev is unaffected. Requires port 30112 to be public (make backstage does that).
+#
+# Two entries are needed because Backstage keys integrations by host:
+#   1. host localhost:30112 matches the repoUrl the template builds, so publish:gitea
+#      finds it. Its forwarded baseUrl makes publish emit forwarded repo/content URLs.
+#   2. host <forwarded-domain> matches those forwarded URLs, so catalog:register (which
+#      looks up the integration by the repoContentsUrl host) and the URL reader resolve.
+integrations:
+  gitea:
+    - host: localhost:30112
+      baseUrl: https://${CODESPACE_NAME}-30112.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+      username: admin
+      password: a-super-secure-password
+    - host: ${CODESPACE_NAME}-30112.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+      baseUrl: https://${CODESPACE_NAME}-30112.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+      username: admin
+      password: a-super-secure-password
+
+# Only the cards' deep links need the forwarded URLs; the card data still flows
+# through the backend proxies, which stay on localhost because the backend runs
+# on the Codespace host. Requires ports 30100 / 30113 to be public (make
+# backstage does that).
+argocd:
+  baseUrl: https://${CODESPACE_NAME}-30100.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+
+argoWorkflows:
+  baseUrl: https://${CODESPACE_NAME}-30113.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}

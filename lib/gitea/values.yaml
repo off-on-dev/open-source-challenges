@@ -14,7 +14,7 @@ gitea:
 service:
   http:
     type: NodePort
-    nodePort: 30110
+    nodePort: 30112
 
 # Disable persistence and use SQLite to keep the setup lightweight
 persistence:

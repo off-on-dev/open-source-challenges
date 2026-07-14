@@ -1,0 +1,128 @@
+# The delivery pipeline: three sequential steps that turn a code-repo push
+# (repo-name, from sensor.yaml) into a running deployment.
+#
+#   git-clone  ->  kaniko-build  ->  update-deploy
+#
+# Clone the vessel's code and read its SHA, build+push an image tagged with it,
+# then bump the deploy repo to that tag. Argo CD (applicationset.yaml) takes it
+# from there.
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: ci-build
+  namespace: argo-workflows
+spec:
+  serviceAccountName: ci-workflow
+  entrypoint: pipeline
+  arguments:
+    parameters:
+      - name: repo-name
+  volumeClaimTemplates:
+    - metadata:
+        name: workspace
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 512Mi
+  volumes:
+    # Registry credentials for kaniko's push. Provisioned in post-create.sh.
+    - name: docker-config
+      secret:
+        secretName: kaniko-docker-config
+        items:
+          - key: config.json
+            path: config.json
+
+  templates:
+    - name: pipeline
+      steps:
+        - - name: git-clone
+            template: git-clone
+        - - name: build-and-push
+            template: kaniko-build
+            arguments:
+              parameters:
+                - name: git-sha
+                  value: "{{steps.git-clone.outputs.parameters.git-sha}}"
+        - - name: update-deploy
+            template: update-deploy
+            arguments:
+              parameters:
+                - name: git-sha
+                  value: "{{steps.git-clone.outputs.parameters.git-sha}}"
+
+    # Clone over Gitea's in-cluster Service (the localhost:30112 NodePort is
+    # only reachable from the host) and report the commit we build from.
+    - name: git-clone
+      outputs:
+        parameters:
+          - name: git-sha
+            valueFrom:
+              path: /workspace/git-sha
+      container:
+        image: alpine/git:2.47.2
+        command: [sh, -c]
+        args:
+          - |
+            git clone "http://admin:a-super-secure-password@gitea-http.gitea.svc.cluster.local:3000/fleet/{{workflow.parameters.repo-name}}" /workspace/code
+            git -C /workspace/code rev-parse --short HEAD > /workspace/git-sha
+            echo "cloned at sha: $(cat /workspace/git-sha)"
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+
+    # Build the Dockerfile and push it to Gitea's registry, tagged with the SHA.
+    - name: kaniko-build
+      inputs:
+        parameters:
+          - name: git-sha
+      # kaniko pushes to localhost:30112 (Gitea's NodePort), which only resolves
+      # on the node itself, so the pod shares the node's network.
+      podSpecPatch: '{"hostNetwork": true}'
+      container:
+        image: gcr.io/kaniko-project/executor:v1.23.2
+        args:
+          - --context=dir:///workspace/code
+          - --destination=localhost:30112/fleet/{{workflow.parameters.repo-name}}:{{inputs.parameters.git-sha}}
+          # Gitea's registry is plain HTTP here, so don't expect TLS.
+          - --insecure
+          - --skip-tls-verify-registry=localhost:30112
+          - --compressed-caching=false
+          - --ignore-path=/product_uuid
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+          - name: docker-config
+            mountPath: /kaniko/.docker
+
+    # Point the deploy repo at the new image: clone it, rewrite deployment.yaml's
+    # tag (":pending" on the first build) to this SHA, and push. Argo CD notices
+    # the push and rolls it out.
+    # In production, I'd never implement this with sed: a dedicated tool (Argo CD
+    # Image Updater, kustomize edit) would be way more robust.
+    - name: update-deploy
+      inputs:
+        parameters:
+          - name: git-sha
+      container:
+        image: alpine/git:2.47.2
+        command: [sh, -c]
+        args:
+          - |
+            DEPLOY_REPO="{{workflow.parameters.repo-name}}-deploy"
+            git config --global user.email "ci@fleet.local"
+            git config --global user.name "Fleet CI"
+            git clone "http://admin:a-super-secure-password@gitea-http.gitea.svc.cluster.local:3000/fleet/${DEPLOY_REPO}" /workspace/deploy
+            cd /workspace/deploy
+            # A real platform would bump the tag with a dedicated tool (Argo CD
+            # Image Updater, a kustomize edit); sed keeps it visible here.
+            sed -i "s|\(image: localhost:30112/fleet/{{workflow.parameters.repo-name}}:\).*|\1{{inputs.parameters.git-sha}}|" deployment.yaml
+            git add deployment.yaml
+            # Skip the commit when the tag is unchanged (e.g. a re-run on the
+            # same SHA), which would otherwise fail with "nothing to commit".
+            git diff --cached --quiet || git commit -m "ci: bump {{workflow.parameters.repo-name}} to {{inputs.parameters.git-sha}}"
+            git push
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace

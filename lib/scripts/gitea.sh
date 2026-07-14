@@ -35,3 +35,63 @@ check_gitea_repo_has_file() {
     FAILED_CHECKS+=("check_gitea_repo_has_file:$org/$repo:$path")
   fi
 }
+
+# -----------------------------------------------------------------------------
+# Assert a file in a repo (default branch) DOES contain a given string.
+# Used to confirm a required line is present, e.g. a catalog-info.yaml carries
+# the "argocd/app-name" annotation that wires the vessel to its deployment.
+# Usage: check_gitea_file_contains <base_url> <auth> <org> <repo> <path> <needle> <display> <hint>
+# -----------------------------------------------------------------------------
+check_gitea_file_contains() {
+  local base_url=$1 auth=$2 org=$3 repo=$4 path=$5 needle=$6 display_name=$7 hint=$8
+
+  print_test_section "Checking $display_name..."
+
+  local content
+  content=$(curl -sf -u "$auth" "$base_url/api/v1/repos/$org/$repo/raw/$path" 2>/dev/null || echo "")
+
+  if [[ -z "$content" ]]; then
+    print_error_indent "$display_name - could not read '$path' from '$org/$repo'"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("gitea_file_missing:$org/$repo:$path")
+  elif echo "$content" | grep -q "$needle"; then
+    print_success_indent "$display_name"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    print_error_indent "$display_name - '$path' is missing '$needle'"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("gitea_file_missing_content:$org/$repo:$needle")
+  fi
+}
+
+# -----------------------------------------------------------------------------
+# Assert a file in a repo (default branch) does NOT contain a given string.
+# Used to confirm a placeholder was replaced, e.g. a deploy manifest's image tag
+# is no longer ":pending" after CI bumped it.
+# Usage: check_gitea_file_not_contains <base_url> <auth> <org> <repo> <path> <needle> <display> <hint>
+# -----------------------------------------------------------------------------
+check_gitea_file_not_contains() {
+  local base_url=$1 auth=$2 org=$3 repo=$4 path=$5 needle=$6 display_name=$7 hint=$8
+
+  print_test_section "Checking $display_name..."
+
+  local content
+  content=$(curl -sf -u "$auth" "$base_url/api/v1/repos/$org/$repo/raw/$path" 2>/dev/null || echo "")
+
+  if [[ -z "$content" ]]; then
+    print_error_indent "$display_name - could not read '$path' from '$org/$repo'"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("gitea_file_missing:$org/$repo:$path")
+  elif echo "$content" | grep -q "$needle"; then
+    print_error_indent "$display_name - '$path' still contains '$needle'"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("gitea_file_contains:$org/$repo:$needle")
+  else
+    print_success_indent "$display_name"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  fi
+}

@@ -20,7 +20,7 @@
       }
     }
   },
-  "forwardPorts": [3000, 7007, 30110],
+  "forwardPorts": [3000, 7007, 30112],
   "portsAttributes": {
     "3000": {
       "label": "Backstage",
@@ -30,7 +30,7 @@
       "label": "Backstage Backend",
       "onAutoForward": "silent"
     },
-    "30110": {
+    "30112": {
       "label": "Gitea",
       "onAutoForward": "notify"
     }

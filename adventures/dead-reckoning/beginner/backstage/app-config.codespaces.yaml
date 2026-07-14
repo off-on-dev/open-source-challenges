@@ -10,23 +10,23 @@ backend:
   cors:
     origin: https://${CODESPACE_NAME}-3000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
 
-# In a Codespace, localhost:30110 is not reachable from the browser, so every
+# In a Codespace, localhost:30112 is not reachable from the browser, so every
 # Gitea URL Backstage generates (repo links, catalog source location) must use
 # the public forwarded URL instead. The base app-config.yaml keeps localhost, so
-# local dev is unaffected. Requires port 30110 to be public (make backstage does that).
+# local dev is unaffected. Requires port 30112 to be public (make backstage does that).
 #
 # Two entries are needed because Backstage keys integrations by host:
-#   1. host localhost:30110 matches the repoUrl the template builds, so publish:gitea
+#   1. host localhost:30112 matches the repoUrl the template builds, so publish:gitea
 #      finds it. Its forwarded baseUrl makes publish emit forwarded repo/content URLs.
 #   2. host <forwarded-domain> matches those forwarded URLs, so catalog:register (which
 #      looks up the integration by the repoContentsUrl host) and the URL reader resolve.
 integrations:
   gitea:
-    - host: localhost:30110
-      baseUrl: https://${CODESPACE_NAME}-30110.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+    - host: localhost:30112
+      baseUrl: https://${CODESPACE_NAME}-30112.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
       username: admin
       password: a-super-secure-password
-    - host: ${CODESPACE_NAME}-30110.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
-      baseUrl: https://${CODESPACE_NAME}-30110.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+    - host: ${CODESPACE_NAME}-30112.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+      baseUrl: https://${CODESPACE_NAME}-30112.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
       username: admin
       password: a-super-secure-password

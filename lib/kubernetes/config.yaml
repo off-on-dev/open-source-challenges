@@ -47,3 +47,17 @@ nodes:
   - hostPort: 30111
     containerPort: 30111
     protocol: TCP
+    # Gitea (Dead Reckoning)
+  - hostPort: 30112
+    containerPort: 30112
+    protocol: TCP
+    # Argo Workflows (Dead Reckoning)
+  - hostPort: 30113
+    containerPort: 30113
+    protocol: TCP
+# Trust Gitea's plain-HTTP container registry (Dead Reckoning). Gitea is exposed
+# on NodePort 30112, and kaniko/kubelet pull images from localhost:30112.
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:30112"]
+    endpoint = ["http://localhost:30112"]

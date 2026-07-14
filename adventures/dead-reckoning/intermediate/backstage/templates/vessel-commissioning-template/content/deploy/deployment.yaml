@@ -1,0 +1,27 @@
+# Runs the vessel's built image. It starts on ":pending", a tag that doesn't
+# exist yet; the pipeline's update-deploy step rewrites it to a real SHA after
+# the first build. Until then this ImagePullBackOffs and Argo CD's selfHeal
+# recovers it once the tag lands. (A tighter pipeline would create the deploy
+# repo already pointing at a built image, but the pending->real flip makes the
+# delivery step visible here.)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${{ values.name }}
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${{ values.name }}
+  template:
+    metadata:
+      labels:
+        app: ${{ values.name }}
+    spec:
+      containers:
+        - name: ${{ values.name }}
+          image: localhost:30112/fleet/${{ values.name }}:pending
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080

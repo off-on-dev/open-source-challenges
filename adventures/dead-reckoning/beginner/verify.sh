@@ -22,14 +22,14 @@ TEMPLATE_FILE="$SCRIPT_DIR/backstage/templates/vessel-commissioning/template.yam
 BACKSTAGE_URL="http://localhost:7007"
 TEMPLATE_REF="template:default/vessel-commissioning"
 
-GITEA_URL="http://localhost:30110"
+GITEA_URL="http://localhost:30112"
 GITEA_AUTH="admin:a-super-secure-password"
 GITEA_ORG="fleet"
 
 # A unique, disposable vessel so repeated runs never collide, and it is obvious
 # in Gitea/the catalog that it came from verification.
 VESSEL_NAME="hms-verify-$(date +%s)"
-REPO_URL="localhost:30110?owner=${GITEA_ORG}&repo=${VESSEL_NAME}"
+REPO_URL="localhost:30112?owner=${GITEA_ORG}&repo=${VESSEL_NAME}"
 
 print_header \
   'Dead Reckoning' \

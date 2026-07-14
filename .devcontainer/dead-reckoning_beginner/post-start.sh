@@ -8,7 +8,7 @@ cat <<'EOF'
 ✨ Dead Reckoning — 🟢 Beginner (Laying the Keel)
 
 The platform is ready:
-  • Gitea (the archives) is running in the cluster on port 30110
+  • Gitea (the archives) is running in the cluster on port 30112
   • The vessel commissioning template is loaded into Backstage
 
 ▶  Start Backstage (the commission office):

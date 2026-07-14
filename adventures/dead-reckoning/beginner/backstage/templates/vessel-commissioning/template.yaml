@@ -82,7 +82,7 @@ spec:
           ui:field: RepoUrlPicker
           ui:options:
             allowedHosts:
-              - localhost:30110
+              - localhost:30112
             allowedOwners:
               - fleet
 

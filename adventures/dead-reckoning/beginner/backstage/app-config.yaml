@@ -48,8 +48,8 @@ integrations:
   # baseUrl must be set explicitly: without it the integration defaults to
   # https://<host>, but Gitea serves plain HTTP here (ERR_SSL_WRONG_VERSION_NUMBER).
   gitea:
-    - host: localhost:30110
-      baseUrl: http://localhost:30110
+    - host: localhost:30112
+      baseUrl: http://localhost:30112
       username: admin
       password: a-super-secure-password
 

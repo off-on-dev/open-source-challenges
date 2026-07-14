@@ -352,3 +352,47 @@ check_label_not_exists() {
     FAILED_CHECKS+=("label_not_exists:$display_name")
   fi
 }
+
+# Wait for a Deployment to become available, port-forward its Service, and assert
+# the HTTP response body contains an expected string. A reusable end-of-pipeline
+# "did the workload actually come up and answer" check.
+# Usage: check_deployment_serves <name> <namespace> <svc-port> <local-port> <expected> <display> <hint> [timeout_s]
+check_deployment_serves() {
+  local name=$1 ns=$2 svc_port=$3 local_port=$4 expected=$5 display_name=$6 hint=$7 timeout=${8:-120}
+
+  print_test_section "Checking $display_name..."
+
+  if ! kubectl rollout status "deployment/$name" -n "$ns" --timeout="${timeout}s" >/dev/null 2>&1; then
+    print_error_indent "$display_name - deployment/$name never became available in '$ns'"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("deployment_unavailable:$name")
+    return
+  fi
+
+  if ! setup_port_forward "$name" "$ns" "$local_port" "$svc_port" >/dev/null 2>&1; then
+    print_error_indent "$display_name - could not port-forward svc/$name in '$ns'"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("port_forward_failed:$name")
+    return
+  fi
+
+  local body="" tries=0
+  while [[ $tries -lt 10 ]]; do
+    body=$(curl -s --max-time 5 "http://localhost:$local_port/" 2>/dev/null || echo "")
+    [[ "$body" == *"$expected"* ]] && break
+    sleep 2
+    tries=$((tries + 1))
+  done
+
+  if [[ "$body" == *"$expected"* ]]; then
+    print_success_indent "$display_name -> $body"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    print_error_indent "$display_name - unexpected response: ${body:-<empty>}"
+    print_hint "$hint"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+    FAILED_CHECKS+=("http_unexpected:$name")
+  fi
+}

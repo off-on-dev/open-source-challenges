@@ -1,0 +1,47 @@
+{
+  "name": "🧭 Dead Reckoning | 🟡 Intermediate (Sea Trial)",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/dead-reckoning/intermediate",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/dead-reckoning_intermediate/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/dead-reckoning_intermediate/post-start.sh",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [],
+      "permissions": {
+        "codespaces": "write"
+      }
+    }
+  },
+  "forwardPorts": [3000, 7007, 30112, 30100, 30113],
+  "portsAttributes": {
+    "3000": {
+      "label": "Backstage",
+      "onAutoForward": "notify"
+    },
+    "7007": {
+      "label": "Backstage Backend",
+      "onAutoForward": "silent"
+    },
+    "30112": {
+      "label": "Gitea",
+      "onAutoForward": "notify"
+    },
+    "30100": {
+      "label": "Argo CD",
+      "onAutoForward": "silent"
+    },
+    "30113": {
+      "label": "Argo Workflows",
+      "onAutoForward": "silent"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

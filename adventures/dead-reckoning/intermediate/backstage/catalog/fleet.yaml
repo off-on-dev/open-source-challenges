@@ -1,0 +1,22 @@
+---
+# The fleets a vessel can be assigned to. The commissioning template's
+# EntityPicker lists these (it filters on kind: System), and the scaffolded
+# vessel becomes part of the fleet it is commissioned into.
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-system
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: home-fleet
+  title: Home Fleet
+  description: Vessels that patrol home waters and guard the harbours.
+spec:
+  owner: windward
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: expeditionary-fleet
+  title: Expeditionary Fleet
+  description: Vessels dispatched on long voyages beyond the charts.
+spec:
+  owner: vanguard

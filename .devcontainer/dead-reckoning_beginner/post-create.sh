@@ -26,7 +26,7 @@ track_container_created
 # The scaffolder's publish:gitea action can only create repos under an existing
 # organization, so this must exist before the commissioning template runs.
 echo "✨ Creating Gitea organization 'fleet'"
-GITEA_URL="http://localhost:30110"
+GITEA_URL="http://localhost:30112"
 until curl -sf "$GITEA_URL/api/v1/version" >/dev/null 2>&1; do sleep 3; done
 # Idempotent: a re-run returns 422 (org already exists), which we ignore.
 curl -sf -X POST "$GITEA_URL/api/v1/orgs" \

@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: "${{ values.description }}"
+  links:
+    # Surfaced in the Links card on the vessel's page. The code repo is already
+    # reachable via "View Source"; this adds its deployment repository.
+    - url: ${{ values.deployUrl }}
+      title: Deployment repository
+spec:
+  type: service
+  lifecycle: ${{ values.lifecycle }}
+  owner: ${{ values.owner }}
+  system: ${{ values.system }}

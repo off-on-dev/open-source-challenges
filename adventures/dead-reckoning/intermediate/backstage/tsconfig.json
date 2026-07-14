@@ -1,0 +1,16 @@
+{
+  "extends": "@backstage/cli/config/tsconfig.json",
+  "include": [
+    "packages/*/src",
+    "packages/*/config.d.ts"
+  ],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "outDir": "dist-types",
+    "rootDir": ".",
+    "jsx": "react-jsx",
+    // Base config pulls in "jest" types; this challenge ships no tests, so keep
+    // only "node" to avoid depending on @types/jest.
+    "types": ["node"]
+  }
+}

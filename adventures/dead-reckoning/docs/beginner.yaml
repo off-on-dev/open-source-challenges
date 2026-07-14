@@ -6,6 +6,10 @@ community_url: "" # TODO: add community thread URL once the adventure is live
 
 summary: "Fix a broken Backstage software template so the commission office can register new vessels for service."
 
+topics:
+  - Backstage
+  - Gitea
+
 audience: >-
   Platform engineers, developers, and anyone curious about internal developer platforms and self-service
   scaffolding. No prior Backstage experience is needed, but familiarity with YAML and basic Git concepts will help.
@@ -56,7 +60,7 @@ architecture:
     misconfigured, the whole commission fails.
   - >-
     All infrastructure is pre-provisioned, with nothing to install. **Gitea** (the archives) runs in a Kubernetes 
-    cluster on port 30110; **Backstage** (the commission office) runs alongside as a standalone instance on port 3000, 
+    cluster on port 30112; **Backstage** (the commission office) runs alongside as a standalone instance on port 3000, 
     already wired to Gitea.
   - >-
     Good news: you can trust the platform. The Backstage app and its configuration, Gitea, and the cluster are all
@@ -97,7 +101,7 @@ how_to_play:
       templates, letting you browse the scaffolder's available actions and edit a template with a
       live preview and a safe dry-run. Poke around and see what each one does.
 
-      Open **Gitea** on port 30110 (the archives) and the Backstage **catalog** to see what does,
+      Open **Gitea** on port 30112 (the archives) and the Backstage **catalog** to see what does,
       and doesn't, make it through when you run the template.
   - id: fix
     title: "Repair the Template"

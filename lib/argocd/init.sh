@@ -53,7 +53,12 @@ trap 'rm -rf "${manifests_tmp}"' EXIT
 cp -r "$SCRIPT_DIR/manifests/." "${manifests_tmp}/"
 sed -i "s|argoproj/argo-cd/[^/]*/manifests/install.yaml|argoproj/argo-cd/${version}/manifests/install.yaml|" \
   "${manifests_tmp}/kustomization.yaml"
-kubectl apply -k "${manifests_tmp}"
+# Server-side apply: recent Argo CD CRDs (applications/applicationsets) are
+# large enough that client-side apply's kubectl.kubernetes.io/last-applied-configuration
+# annotation pushes metadata.annotations past Kubernetes' 256KiB limit. This is
+# a known Argo CD issue; --server-side avoids the annotation entirely instead
+# of shrinking under it. See https://argo-cd.readthedocs.io/en/latest/operator-manual/upgrading/3.2-3.3/
+kubectl apply -k "${manifests_tmp}" --server-side --force-conflicts
 
 echo "✨ Installing Argo CD CLI"
 # shellcheck disable=SC1091

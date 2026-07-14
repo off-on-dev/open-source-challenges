@@ -1,0 +1,33 @@
+# RBAC for the delivery workflow. Its pods run as "ci-workflow". With the default
+# (emissary) executor, each step reports its result back to the controller by
+# writing a workflowtaskresult, so that is the single permission it needs. Least
+# privilege: no pods/exec or pods/log (those are for legacy executors we don't use).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ci-workflow
+  namespace: argo-workflows
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: workflow-executor
+  namespace: argo-workflows
+rules:
+  - apiGroups: [argoproj.io]
+    resources: [workflowtaskresults]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-workflow
+  namespace: argo-workflows
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: workflow-executor
+subjects:
+  - kind: ServiceAccount
+    name: ci-workflow
+    namespace: argo-workflows

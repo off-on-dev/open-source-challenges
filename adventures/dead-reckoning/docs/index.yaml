@@ -5,10 +5,9 @@ emoji: "🧭"
 tags:
   - Backstage
   - Gitea
+  - Argo Events
   - Argo Workflows
   - Argo CD
-  - OpenTelemetry
-  - Jaeger
 
 backstory:
   - >-

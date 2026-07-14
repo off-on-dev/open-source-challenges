@@ -78,6 +78,23 @@ policy exists.
   that players open their Codespace and the problem is immediately visible — not a blank
   slate. The broken state should be the first thing they see.
 
+### Ports (NodePorts)
+
+NodePorts are a single, cluster-wide namespace. `lib/kubernetes/config.yaml` (shared by
+every adventure) maps each one to the host, so a port number must mean the same tool
+everywhere. Treat that file as the authoritative port registry.
+
+- **One tool, one port, globally.** Never reuse a NodePort for a different tool. If two
+  challenges each grabbed, say, 30110 for different services, a future challenge that needs
+  both tools at once could not run. Gitea is always 30112, Falcosidekick always 30111, and
+  so on.
+- **Reuse across levels is fine for the same tool** (the Dead Reckoning beginner and
+  intermediate both serve Gitea on 30112). Reuse across *different* tools is not.
+- **Adding a new tool:** claim the next free `hostPort`/`containerPort` in
+  `lib/kubernetes/config.yaml`, label it with the tool's name in a comment, and forward it
+  in the level's `devcontainer.json`. If the tool is already listed there, reuse its
+  existing port instead of allocating a new one.
+
 ### Makefile
 
 Keep it minimal. For a typical challenge level:

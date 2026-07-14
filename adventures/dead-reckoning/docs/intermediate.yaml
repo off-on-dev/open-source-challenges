@@ -1,0 +1,209 @@
+level: intermediate
+emoji: "🟡"
+title: "Sea Trial"
+devcontainer: dead-reckoning_intermediate
+community_url: "" # TODO: add community thread URL once the adventure is live
+
+summary: "Fix the broken integration points in the delivery pipeline so that commissioning a vessel in Backstage results in a running deployment."
+
+topics:
+  - Backstage
+  - Gitea
+  - Argo Events
+  - Argo Workflows
+  - Argo CD
+
+audience: >-
+  Platform and DevOps engineers who have met these tools before and want to see how they fit together. You
+  should be comfortable with Kubernetes, YAML, and reading a tool's logs and UI. Prior exposure to Backstage,
+  Gitea, and the Argo projects helps, but the focus here is the integration between them, not any one tool.
+
+backstory:
+  - >-
+    The commission office is back in business: manifests are filed, repositories are created, and every new vessel
+    is entered into the fleet registry. Yet the captains keep coming back with the same complaint. Their vessels are
+    commissioned on paper, but they never actually sail.
+  - >-
+    Between the commission office and open water lies a chain of yards, each meant to pick up where the last left
+    off: a push to the archives should summon the shipyard, the shipyard should build the hull from the plans and
+    hand it to the harbor master, and the harbor master should bring the finished vessel into formation. Somewhere
+    along that chain the handoffs are misconfigured, and every vessel stalls before it reaches the water.
+  - >-
+    Your mission: trace a single commission from the office all the way to open water, find every point where the
+    chain is broken, and repair the integrations so that commissioning a vessel results in a running ship you can
+    reach directly.
+
+objective:
+  - >-
+    A commissioned vessel is fully delivered: its code and deployment repositories exist, its delivery workflow has completed, its Argo CD Application is synced, and its service is running in the cluster
+  - >-
+    See the vessel's live deployment status on its page in Backstage
+  - >-
+    The vessel's service is reachable directly and reports itself seaworthy
+
+what_you_learn:
+  - >-
+    How a Git webhook reaches a workflow engine: an Argo Events
+    [EventSource and Sensor](https://argoproj.github.io/argo-events/concepts/sensor/) turn a push into a running
+    workflow, [shaping the trigger](https://argoproj.github.io/argo-events/tutorials/02-parameterization/) from the
+    event's data
+  - >-
+    How [Argo Workflows](https://argo-workflows.readthedocs.io/en/latest/walk-through/steps/) orchestrates a
+    multi-step delivery pipeline, and how a workflow's
+    [service-account RBAC](https://argo-workflows.readthedocs.io/en/latest/workflow-rbac/) lets its steps run
+  - >-
+    How an Argo CD
+    [ApplicationSet](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-SCM-Provider/)
+    auto-discovers repositories and how its
+    [sync policy](https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/) reconciles them into the cluster
+  - >-
+    How Backstage surfaces external system state on a catalog entity through
+    [annotations](https://backstage.io/docs/features/software-catalog/well-known-annotations), so a vessel's page
+    can show its live deployment status
+  - >-
+    How to trace a silent failure across several tools by reading each one's logs and UI, following the data from
+    one handoff to the next
+
+architecture:
+  - >-
+    Commissioning a vessel kicks off a delivery pipeline that spans several tools. Backstage files two repositories
+    in Gitea (the vessel's code and its deployment manifests). A push to the code repository fires a Gitea webhook
+    into **Argo Events**, whose Sensor submits an **Argo Workflow**. That workflow clones the code, builds a
+    container image and pushes it to Gitea's registry, then stamps the new image tag onto the deployment
+    repository. **Argo CD** discovers the deployment repository and syncs it into the cluster as a running Deployment
+    and Service. The diagram below shows the full chain.
+  - >-
+    Each vessel's page in Backstage is your cockpit: it shows the vessel's live Argo CD sync and health and its
+    delivery workflows, so you can watch a commission progress and spot where it stalls. Alongside it, use each
+    tool's own view: Gitea's repositories and a webhook's Recent Deliveries, the Argo Workflows UI (port 30113),
+    and the Argo CD UI (port 30100).
+  - >-
+    You edit two things: the delivery pipeline manifests under `platform/` (`argo-events/`, `argo-workflows/`,
+    `argocd/`) and the vessel commissioning template under
+    `backstage/templates/vessel-commissioning-template/`.
+  - >-
+    This level runs a real container build on a Kubernetes cluster. It works on the default Codespace, but if you
+    hit resource problems or the pipeline feels sluggish, upgrade to a larger (**4-core / 16 GB**) machine. Either
+    way, give the pipeline a few minutes after commissioning: the first build pulls its base images before an image
+    ever reaches the cluster.
+  - >-
+    > A quick translation from the story to the tools: a **vessel** is a small service you deploy, made up of its
+    code repository, its deployment manifests, and the running Deployment and Service in the cluster. The
+    **commission office** is Backstage, the **archives** are Gitea, the **shipyard** is Argo Workflows, and the
+    **harbor master** is Argo CD; Argo Events is the lookout that summons the shipyard when new code is filed. A
+    vessel "reaching open water" just means a commissioned service made it all the way to a running, reachable
+    deployment.
+
+architecture_diagram: "dead-reckoning-intermediate.svg"
+diagram_alt: "Left-to-right delivery pipeline: Backstage creates the repositories, Argo Events triggers the CI build, Argo Workflows builds the image and updates the tag, Argo CD syncs the deployment, and the vessel's app is up and running."
+
+toolbox:
+  - name: Backstage
+    url: "https://backstage.io/docs/features/software-catalog/"
+    description: >-
+      The commission office and your cockpit (port 3000). Commission a vessel from Create, then watch its page for
+      the vessel's Argo CD status and delivery workflows.
+  - name: Gitea
+    url: "https://docs.gitea.com/"
+    description: >-
+      The archives (port 30112). Holds each vessel's code and deployment repositories, the org webhook, and the
+      container registry. A webhook's Recent Deliveries shows whether a push was delivered.
+  - name: Argo Workflows
+    url: "https://argo-workflows.readthedocs.io/en/latest/"
+    description: >-
+      The shipyard (port 30113). Runs the multi-step build-and-deliver workflow; its UI shows each run, step by
+      step, and why a step failed.
+  - name: Argo CD
+    url: "https://argo-cd.readthedocs.io/en/stable/"
+    description: >-
+      The harbor master (port 30100). Discovers deployment repositories and reconciles them into the cluster; its
+      UI shows each vessel's sync and health.
+
+services:
+  - name: "Backstage"
+    port: 3000
+    description: "The commission office and your cockpit. Start it with `make backstage`, then commission vessels and watch each one's page. Signs in as a guest, no credentials needed."
+  - name: "Gitea"
+    port: 30112
+    credentials: "admin / a-super-secure-password"
+    description: "The archives: each vessel's code and deployment repositories, the org webhook (Recent Deliveries), and the container registry."
+  - name: "Argo Workflows"
+    port: 30113
+    description: "The shipyard: the delivery workflow runs, step by step, with per-step logs. No sign-in required."
+  - name: "Argo CD"
+    port: 30100
+    credentials: "readonly / a-super-secure-password"
+    description: "The harbor master: each vessel's Application, sync status, and health."
+
+how_to_play:
+  - id: start
+    title: "Open the Commission Office"
+    content: |
+      Start Backstage with `make backstage`. The first run compiles for ~30-60s; once it's up, the commission
+      office is available in your browser on port 3000. Leave it running in that terminal; restart any time with
+      Ctrl-C then `make backstage`.
+
+      The rest of the platform (Gitea, Argo Events, Argo Workflows, Argo CD) is already running in the cluster.
+  - id: explore
+    title: "Trace a Commission"
+    content: |
+      In Backstage, go to **Create** and run the **Commission a Vessel** template. It will commission cleanly, but
+      the vessel won't sail. That's expected: your job is to find out why.
+
+      Open the new vessel's page in the catalog. It's your cockpit: it shows the vessel's Argo CD deployment status
+      and its delivery workflows. From there, follow the chain outward and see how far each commission gets:
+
+      - **Gitea** (port 30112): were both repositories created? Did the push reach the pipeline (check a webhook's
+        Recent Deliveries)?
+      - **Argo Workflows** (port 30113): did a build run for this vessel, and if it failed, what does the failing
+        step report?
+      - **Argo CD** (port 30100): is there an Application for the vessel, and is it synced and healthy?
+
+      Each tool shows you one handoff. Follow the data from one to the next until you find where it stalls.
+  - id: fix
+    title: "Repair the Integrations"
+    content: |
+      The breaks live in the delivery pipeline manifests and the commissioning template:
+
+      ```
+      platform/argo-events/
+      platform/argo-workflows/
+      platform/argocd/
+      backstage/templates/vessel-commissioning-template/
+      ```
+
+      Read the relevant file top to bottom and compare it against what you observed. After editing a `platform/`
+      manifest, re-apply it with `make apply`. Because the pipeline is triggered by a push, test a fix by
+      commissioning a fresh vessel (or redelivering the push from Gitea's Recent Deliveries). Changes to the
+      template take effect on the next vessel you commission.
+
+      When you think a vessel can sail end to end, check your work. `make verify` grades the most recently
+      commissioned vessel stage by stage and reports the first place the pipeline runs aground:
+
+      ```bash
+      make verify
+      ```
+
+verification:
+  command: "make verify"
+  description: "Grades the most recently commissioned vessel stage by stage, from its repositories through the delivery workflow to a synced Argo CD Application and a reachable service, and reports the first place the pipeline runs aground."
+
+helpful_links:
+  - title: "Backstage: Well-known Annotations"
+    url: "https://backstage.io/docs/features/software-catalog/well-known-annotations"
+    description: "How annotations on a catalog entity link it to external systems shown on its page"
+  - title: "Argo Events: Sensor"
+    url: "https://argoproj.github.io/argo-events/concepts/sensor/"
+    description: "How a Sensor listens for events and triggers actions, and how it shapes a trigger from the event's data"
+  - title: "Argo Workflows: Steps"
+    url: "https://argo-workflows.readthedocs.io/en/latest/walk-through/steps/"
+    description: "How a workflow chains multiple steps and passes data between them"
+  - title: "Argo Workflows: Workflow RBAC"
+    url: "https://argo-workflows.readthedocs.io/en/latest/workflow-rbac/"
+    description: "What permissions a workflow's service account needs for its steps to run and report status"
+  - title: "Argo CD: SCM Provider Generator"
+    url: "https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-SCM-Provider/"
+    description: "How an ApplicationSet auto-discovers repositories and turns each into an Application"
+  - title: "Argo CD: Automated Sync"
+    url: "https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/"
+    description: "How Argo CD reconciles an Application's desired state into the cluster"

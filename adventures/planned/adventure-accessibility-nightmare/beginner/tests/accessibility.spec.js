@@ -25,7 +25,9 @@ test('homepage has no serious or critical accessibility violations', async ({
     expect(summary, JSON.stringify(summary, null, 2)).toEqual([]);
 });
 
-test('menu and primary action are keyboard reachable', async ({ page }) => {
+test('menu and primary action are keyboard reachable with visible focus', async ({
+    page,
+}) => {
     await page.goto('/');
 
     const menu = page.getByText('Menu', { exact: true });
@@ -34,9 +36,28 @@ test('menu and primary action are keyboard reachable', async ({ page }) => {
     await expect(menu).toBeVisible();
     await expect(startShopping).toBeVisible();
 
-    await menu.focus();
-    await expect(menu).toBeFocused();
+    for (const element of [menu, startShopping]) {
+        await element.focus();
+        await expect(element).toBeFocused();
 
-    await startShopping.focus();
-    await expect(startShopping).toBeFocused();
+        const focusStyles = await element.evaluate((node) => {
+            const styles = getComputedStyle(node);
+            return {
+                outlineStyle: styles.outlineStyle,
+                outlineWidth: styles.outlineWidth,
+                boxShadow: styles.boxShadow,
+            };
+        });
+
+        const hasVisibleOutline =
+            focusStyles.outlineStyle !== 'none' &&
+            focusStyles.outlineWidth !== '0px';
+
+        const hasVisibleBoxShadow = focusStyles.boxShadow !== 'none';
+
+        expect(
+            hasVisibleOutline || hasVisibleBoxShadow,
+            `Expected a visible focus indicator, got ${JSON.stringify(focusStyles)}`,
+        ).toBe(true);
+    }
 });

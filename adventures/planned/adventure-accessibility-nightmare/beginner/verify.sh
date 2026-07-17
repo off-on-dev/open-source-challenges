@@ -10,10 +10,11 @@ source "$SCRIPT_DIR/../../../../lib/scripts/loader.sh"
 set_tracking_context "adventure-accessibility-nightmare" "beginner" "" "TODO" "TODO"
 
 OBJECTIVE="
-- Run Lighthouse and axe-core to identify and interpret the accessibility violations
-- Fix color contrast and missing alt text on all homepage assets
-- Ensure all interactive elements are keyboard accessible and have visible Focus Appearance (WCAG 2.4.11)
-- Achieve a Lighthouse accessibility score of 95+ with zero critical axe-core violations"
+- Remove all serious and critical axe-core violations from the ShopSmart homepage.
+- Provide meaningful alternative text for every informative image.
+- Ensure the menu and primary call-to-action are semantic, keyboard-focusable controls.
+- Add visible focus indicators for interactive elements.
+- Achieve a Lighthouse accessibility score of at least 95."
 
 DOCS_URL="https://offon.dev/adventures/adventure-accessibility-nightmare/levels/beginner"
 

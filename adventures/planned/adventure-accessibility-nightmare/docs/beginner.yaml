@@ -38,7 +38,7 @@ objective:
 
 what_you_learn:
   - >-
-    How to interpret automated axe-core accessibility reports.
+    How to interpret automated [axe-core](https://github.com/dequelabs/axe-core) accessibility reports.
   - >-
     How semantic HTML affects keyboard and assistive-technology behavior.
   - >-
@@ -46,7 +46,7 @@ what_you_learn:
   - >-
     How to provide useful text alternatives for images.
   - >-
-    How to verify accessibility outcomes with Playwright and Lighthouse.
+    How to verify accessibility outcomes with [Playwright](https://playwright.dev/) and [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/).
 
 architecture:
   - >-

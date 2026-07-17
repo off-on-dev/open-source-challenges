@@ -11,9 +11,15 @@
   "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_beginner/post-create.sh",
   "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_beginner/post-start.sh",
   "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-playwright.playwright"
+      ]
+    },
     "codespaces": {
       "openFiles": [
-        "adventures/planned/adventure-accessibility-nightmare/README.md"
+        "src/App.jsx",
+        "src/styles.css"
       ],
       "permissions": {
         "codespaces": "write"

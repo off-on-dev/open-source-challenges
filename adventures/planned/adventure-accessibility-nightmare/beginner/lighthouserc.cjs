@@ -5,6 +5,9 @@ module.exports = {
             startServerReadyPattern: 'Local:',
             url: ['http://127.0.0.1:5173/'],
             numberOfRuns: 1,
+            settings: {
+                chromeFlags: '--no-sandbox --disable-dev-shm-usage --disable-gpu',
+            },
         },
         assert: {
             assertions: {

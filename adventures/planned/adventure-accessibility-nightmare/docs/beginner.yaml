@@ -81,6 +81,17 @@ services:
     description: "The intentionally inaccessible React storefront."
 
 how_to_play:
+  - id: start
+    title: "Start ShopSmart"
+    content: |
+      Start the application from the repository root:
+
+      ```bash
+      make accessibility-nightmare-beginner
+      ```
+
+      Then open port 5173 in your browser.
+
   - id: explore
     title: "Explore the Broken Storefront"
     content: |

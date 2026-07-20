@@ -19,8 +19,8 @@ npm ci
 echo "✨ Installing Playwright Chromium..."
 npx playwright install --with-deps chromium
 
-CHROME_PATH="$(find "$HOME/.cache/ms-playwright" -type f -path '*/chrome-linux/chrome' | head -1)"
-if [[ -n "$CHROME_PATH" ]] && ! grep -q '^export CHROME_PATH=' "$HOME/.bashrc"; then
+CHROME_PATH="$(node -e "const { chromium } = require('playwright'); console.log(chromium.executablePath())")"
+if [[ -x "$CHROME_PATH" ]] && ! grep -q '^export CHROME_PATH=' "$HOME/.bashrc"; then
   echo "export CHROME_PATH=\"$CHROME_PATH\"" >> "$HOME/.bashrc"
 fi
 

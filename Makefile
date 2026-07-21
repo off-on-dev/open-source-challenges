@@ -21,4 +21,4 @@ docs:
 
 
 accessibility-nightmare-beginner:
-	cd adventures/planned/adventure-accessibility-nightmare/beginner && npm run dev
+	$(MAKE) -C adventures/planned/adventure-accessibility-nightmare/beginner app

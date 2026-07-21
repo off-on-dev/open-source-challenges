@@ -1,0 +1,91 @@
+# RBAC for the delivery workflow. Its pods run as "ci-workflow". With the default
+# (emissary) executor, each step reports its result back to the controller by
+# creating and patching a workflowtaskresult, so those are the permissions it
+# needs. Least privilege: no pods/exec or pods/log (those are for legacy
+# executors we don't use).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ci-workflow
+  namespace: argo-workflows
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: workflow-executor
+  namespace: argo-workflows
+rules:
+  - apiGroups: [argoproj.io]
+    resources: [workflowtaskresults]
+    verbs: [create, patch]
+  # The emit-trace step reads this workflow's own step timings to build the
+  # "ci pipeline" span subtree.
+  - apiGroups: [argoproj.io]
+    resources: [workflows]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-workflow
+  namespace: argo-workflows
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: workflow-executor
+subjects:
+  - kind: ServiceAccount
+    name: ci-workflow
+    namespace: argo-workflows
+---
+# The await-rollout step waits on the vessel's Argo CD Application (in the argocd
+# namespace) and emits a rollout span from its status.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ci-workflow-read-applications
+  namespace: argocd
+rules:
+  - apiGroups: [argoproj.io]
+    resources: [applications]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-workflow-read-applications
+  namespace: argocd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ci-workflow-read-applications
+subjects:
+  - kind: ServiceAccount
+    name: ci-workflow
+    namespace: argo-workflows
+---
+# The await-rollout step reads the running Deployment (in the default namespace)
+# to record the provisions the vessel actually sailed with.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ci-workflow-read-deployments
+  namespace: default
+rules:
+  - apiGroups: [apps]
+    resources: [deployments]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-workflow-read-deployments
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ci-workflow-read-deployments
+subjects:
+  - kind: ServiceAccount
+    name: ci-workflow
+    namespace: argo-workflows

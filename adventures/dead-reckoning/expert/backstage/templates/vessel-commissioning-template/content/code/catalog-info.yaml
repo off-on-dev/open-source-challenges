@@ -1,0 +1,20 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: "${{ values.description }}"
+  annotations:
+    # Ties this catalog entity to its live deployment: the Argo CD card on the
+    # vessel's page reads this annotation and shows the sync/health of the
+    # matching Application (the ApplicationSet names each one "<vessel>-deploy").
+    argocd/app-name: ${{ values.name }}-deploy
+  links:
+    # Surfaced in the Links card on the vessel's page. The code repo is already
+    # reachable via "View Source"; this adds its deployment repository.
+    - url: ${{ values.deployUrl }}
+      title: Deployment repository
+spec:
+  type: service
+  lifecycle: ${{ values.lifecycle }}
+  owner: ${{ values.owner }}
+  system: ${{ values.system }}

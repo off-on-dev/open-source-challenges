@@ -1,0 +1,37 @@
+# RBAC for the Sensor. Its "sensor-trigger" SA (in argo-events) needs to submit
+# Workflows from the ci-build template over in argo-workflows. The Argo Events
+# submit trigger resolves the workflowTemplateRef itself (it reads the
+# WorkflowTemplate) and then creates the Workflow, so it needs read on
+# workflowtemplates plus create on workflows.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sensor-trigger
+  namespace: argo-events
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: submit-workflow
+  namespace: argo-workflows
+rules:
+  - apiGroups: [argoproj.io]
+    resources: [workflows]
+    verbs: [create, get, list, watch]
+  - apiGroups: [argoproj.io]
+    resources: [workflowtemplates]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sensor-submit-workflow
+  namespace: argo-workflows
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: submit-workflow
+subjects:
+  - kind: ServiceAccount
+    name: sensor-trigger
+    namespace: argo-events

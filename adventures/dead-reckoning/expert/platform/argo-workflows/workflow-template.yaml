@@ -1,0 +1,251 @@
+# The delivery pipeline: three sequential steps that turn a code-repo push
+# (repo-name, from sensor.yaml) into a running deployment.
+#
+#   git-clone  ->  kaniko-build  ->  update-deploy
+#
+# Clone the vessel's code and read its SHA, build+push an image tagged with it,
+# then bump the deploy repo to that tag. Argo CD (applicationset.yaml) takes it
+# from there.
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: ci-build
+  namespace: argo-workflows
+spec:
+  serviceAccountName: ci-workflow
+  entrypoint: pipeline
+  arguments:
+    parameters:
+      - name: repo-name
+      # The commission's W3C traceparent, so the pipeline's spans join the trace
+      # the commission office opened. This is a deliberately non-standard bit of
+      # context propagation, and worth understanding: the usual way to continue a
+      # trace is to read the traceparent off an incoming request's headers, but
+      # this pipeline has no incoming request. It is woken by a Gitea push event,
+      # with no live call chain from Backstage to carry a header. So the office
+      # serializes the traceparent into the one thing that DOES travel to the
+      # pipeline, the commit it will read (sensor.yaml lifts it back out of the
+      # push), and the trace steps below continue it out-of-band with otel-cli's
+      # --force-*-id flags. A trace can span a boundary that has no call stack;
+      # it just has to ride whatever artifact the far side actually consumes.
+      # Empty for a push without the trailer, in which case those steps no-op.
+      - name: traceparent
+        value: ""
+  volumeClaimTemplates:
+    - metadata:
+        name: workspace
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 512Mi
+  volumes:
+    # Registry credentials for kaniko's push. Provisioned in post-create.sh.
+    - name: docker-config
+      secret:
+        secretName: kaniko-docker-config
+        items:
+          - key: config.json
+            path: config.json
+
+  templates:
+    - name: pipeline
+      steps:
+        - - name: git-clone
+            template: git-clone
+        - - name: build-and-push
+            template: kaniko-build
+            arguments:
+              parameters:
+                - name: git-sha
+                  value: "{{steps.git-clone.outputs.parameters.git-sha}}"
+        - - name: update-deploy
+            template: update-deploy
+            arguments:
+              parameters:
+                - name: git-sha
+                  value: "{{steps.git-clone.outputs.parameters.git-sha}}"
+        # Wait for the harbor master (Argo CD) to bring the vessel into
+        # formation, then record the rollout as a span on the commission's trace.
+        - - name: await-rollout
+            template: await-rollout
+        # Finally, reconstruct the shipyard's work from this workflow's own step
+        # timings and emit it as the "ci pipeline" subtree of the same trace.
+        - - name: emit-trace
+            template: emit-trace
+
+    # Clone over Gitea's in-cluster Service (the localhost:30112 NodePort is
+    # only reachable from the host) and report the commit we build from.
+    - name: git-clone
+      outputs:
+        parameters:
+          - name: git-sha
+            valueFrom:
+              path: /workspace/git-sha
+      container:
+        image: alpine/git:2.47.2
+        command: [sh, -c]
+        args:
+          - |
+            git clone "http://admin:a-super-secure-password@gitea-http.gitea.svc.cluster.local:3000/fleet/{{workflow.parameters.repo-name}}" /workspace/code
+            git -C /workspace/code rev-parse --short HEAD > /workspace/git-sha
+            echo "cloned at sha: $(cat /workspace/git-sha)"
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+
+    # Build the Dockerfile and push it to Gitea's registry, tagged with the SHA.
+    - name: kaniko-build
+      inputs:
+        parameters:
+          - name: git-sha
+      # kaniko pushes to localhost:30112 (Gitea's NodePort), which only resolves
+      # on the node itself, so the pod shares the node's network.
+      podSpecPatch: '{"hostNetwork": true}'
+      container:
+        image: gcr.io/kaniko-project/executor:v1.23.2
+        args:
+          - --context=dir:///workspace/code
+          - --destination=localhost:30112/fleet/{{workflow.parameters.repo-name}}:{{inputs.parameters.git-sha}}
+          # Gitea's registry is plain HTTP here, so don't expect TLS.
+          - --insecure
+          - --skip-tls-verify-registry=localhost:30112
+          - --compressed-caching=false
+          - --ignore-path=/product_uuid
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+          - name: docker-config
+            mountPath: /kaniko/.docker
+
+    # Point the deploy repo at the new image: clone it, rewrite deployment.yaml's
+    # tag (":pending" on the first build) to this SHA, and push. Argo CD notices
+    # the push and rolls it out.
+    # In production, I'd never implement this with sed: a dedicated tool (Argo CD
+    # Image Updater, kustomize edit) would be way more robust.
+    - name: update-deploy
+      inputs:
+        parameters:
+          - name: git-sha
+      container:
+        image: alpine/git:2.47.2
+        command: [sh, -c]
+        args:
+          - |
+            DEPLOY_REPO="{{workflow.parameters.repo-name}}-deploy"
+            git config --global user.email "ci@fleet.local"
+            git config --global user.name "Fleet CI"
+            git clone "http://admin:a-super-secure-password@gitea-http.gitea.svc.cluster.local:3000/fleet/${DEPLOY_REPO}" /workspace/deploy
+            cd /workspace/deploy
+            # A real platform would bump the tag with a dedicated tool (Argo CD
+            # Image Updater, a kustomize edit); sed keeps it visible here.
+            sed -i "s|\(image: localhost:30112/fleet/{{workflow.parameters.repo-name}}:\).*|\1{{inputs.parameters.git-sha}}|" deployment.yaml
+            git add deployment.yaml
+            # Skip the commit when the tag is unchanged (e.g. a re-run on the
+            # same SHA), which would otherwise fail with "nothing to commit".
+            git diff --cached --quiet || git commit -m "ci: bump {{workflow.parameters.repo-name}} to {{inputs.parameters.git-sha}}"
+            git push
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+
+    # Wait for Argo CD to sync the vessel's Application, then emit a "rollout"
+    # span on the commission's trace. The span records the cargo two ways: what
+    # the deployment DECLARES (its manifest env) and what the vessel itself
+    # REPORTS once running (its own HTTP endpoint). In a healthy voyage the two
+    # agree; recording both lets a captain confirm the vessel actually sailed
+    # with what its papers say. Best-effort: never fails the workflow, and
+    # no-ops when there is no traceparent.
+    - name: await-rollout
+      container:
+        image: alpine/k8s:1.31.2
+        command: [sh, -c]
+        args:
+          - |
+            REPO="{{workflow.parameters.repo-name}}"
+            APP="${REPO}-deploy"
+            START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+            echo "Waiting for Argo CD to bring $APP into formation..."
+            HEALTH=""; SYNC=""
+            for _ in $(seq 1 60); do
+              HEALTH=$(kubectl get application "$APP" -n argocd -o jsonpath='{.status.health.status}' 2>/dev/null || true)
+              SYNC=$(kubectl get application "$APP" -n argocd -o jsonpath='{.status.sync.status}' 2>/dev/null || true)
+              echo "  health=$HEALTH sync=$SYNC"
+              [ "$HEALTH" = "Healthy" ] && [ "$SYNC" = "Synced" ] && break
+              sleep 5
+            done
+            END=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+            # What the deployment's manifest declares the cargo to be.
+            DECLARED=$(kubectl get deploy "$REPO" -n default \
+              -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="PROVISIONS")].value}' 2>/dev/null || true)
+            # What the running vessel actually reports carrying. Ask the vessel
+            # itself over its in-cluster Service; retry briefly since it may have
+            # only just become healthy.
+            REPORTED=""
+            for _ in $(seq 1 12); do
+              REPORTED=$(curl -sf --max-time 5 "http://${REPO}.default.svc.cluster.local:8080/" 2>/dev/null \
+                | jq -r '.provisions // empty' 2>/dev/null || true)
+              [ -n "$REPORTED" ] && break
+              sleep 5
+            done
+            echo "Vessel cargo: declared=$DECLARED reported=$REPORTED"
+
+            TP="{{workflow.parameters.traceparent}}"
+            case "$TP" in 00-*) ;; *) echo "no traceparent - skipping rollout span"; exit 0 ;; esac
+            TRACE_ID=$(echo "$TP" | cut -d- -f2)
+            ROOT_SPAN=$(echo "$TP" | cut -d- -f3)
+            SPAN=$(head -c1000 /dev/urandom | tr -dc 'a-f0-9' | head -c 16)
+            curl -sSL "https://github.com/equinix-labs/otel-cli/releases/download/v0.4.5/otel-cli_0.4.5_linux_amd64.tar.gz" \
+              | tar -xzf - -C /usr/local/bin otel-cli
+            otel-cli span --name "rollout" --service argocd \
+              --start "$START" --end "$END" \
+              --force-trace-id "$TRACE_ID" --force-span-id "$SPAN" --force-parent-span-id "$ROOT_SPAN" \
+              --attrs "argocd.app=$APP,argocd.health=$HEALTH,argocd.sync=$SYNC,provisions.declared=$DECLARED,provisions.reported=$REPORTED" \
+              --endpoint "http://collector.otel.svc.cluster.local:4318" --protocol http/protobuf
+            echo "rollout span emitted"
+
+    # Reconstruct the shipyard's work: read this workflow's own step timings and
+    # emit a "ci pipeline" parent span with one child span per build step, all on
+    # the commission's trace. Best-effort; no-ops without a traceparent.
+    - name: emit-trace
+      container:
+        image: alpine/k8s:1.31.2
+        command: [sh, -c]
+        args:
+          - |
+            TP="{{workflow.parameters.traceparent}}"
+            case "$TP" in 00-*) ;; *) echo "no traceparent - skipping trace emit"; exit 0 ;; esac
+            TRACE_ID=$(echo "$TP" | cut -d- -f2)
+            ROOT_SPAN=$(echo "$TP" | cut -d- -f3)
+            CI_SPAN=$(head -c1000 /dev/urandom | tr -dc 'a-f0-9' | head -c 16)
+            ENDPOINT="http://collector.otel.svc.cluster.local:4318"
+            curl -sSL "https://github.com/equinix-labs/otel-cli/releases/download/v0.4.5/otel-cli_0.4.5_linux_amd64.tar.gz" \
+              | tar -xzf - -C /usr/local/bin otel-cli
+
+            # Build-step timings (name|start|finish). jq is used instead of a Go
+            # template so its syntax doesn't collide with Argo's {{ }}. The trace
+            # steps themselves are excluded.
+            kubectl get wf "{{workflow.name}}" -n argo-workflows -o json > /tmp/wf.json
+            STEPS=$(jq -r '.status.nodes[]
+              | select(.type=="Pod")
+              | select(.displayName|test("await-rollout|emit-trace")|not)
+              | "\(.displayName)|\(.startedAt)|\(.finishedAt)"' /tmp/wf.json)
+            [ -z "$STEPS" ] && echo "no build steps found" && exit 0
+
+            CI_START=$(printf '%s\n' "$STEPS" | cut -d'|' -f2 | sort | head -1)
+            CI_END=$(printf '%s\n' "$STEPS" | cut -d'|' -f3 | sort | tail -1)
+            otel-cli span --name "ci pipeline" --service argo-workflows \
+              --start "$CI_START" --end "$CI_END" \
+              --force-trace-id "$TRACE_ID" --force-span-id "$CI_SPAN" --force-parent-span-id "$ROOT_SPAN" \
+              --endpoint "$ENDPOINT" --protocol http/protobuf
+
+            printf '%s\n' "$STEPS" | while IFS='|' read -r NAME S E; do
+              [ -z "$NAME" ] && continue
+              SPAN=$(head -c1000 /dev/urandom | tr -dc 'a-f0-9' | head -c 16)
+              otel-cli span --name "$NAME" --service argo-workflows \
+                --start "$S" --end "$E" \
+                --force-trace-id "$TRACE_ID" --force-span-id "$SPAN" --force-parent-span-id "$CI_SPAN" \
+                --endpoint "$ENDPOINT" --protocol http/protobuf
+            done
+            echo "ci pipeline spans emitted"

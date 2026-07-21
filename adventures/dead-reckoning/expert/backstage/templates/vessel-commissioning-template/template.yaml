@@ -1,0 +1,213 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: vessel-commissioning
+  title: Commission a Vessel
+  description: >-
+    Register a new vessel with the Grand Fleet: draft its papers, open a code
+    repository and a deployment repository for it in the archives, and enter
+    it into the fleet registry.
+  tags:
+    - go
+    - vessel
+spec:
+  owner: guests
+  type: service
+
+  # The commission office form. Each parameters entry is one page of the wizard.
+  # 📖 Form fields and pickers (OwnerPicker, EntityPicker, RepoUrlPicker, ...):
+  #    https://backstage.io/docs/features/software-templates/writing-templates/#specparameters---formstep--formstep
+  parameters:
+    - title: Vessel Details
+      required:
+        - name
+        - lifecycle
+        - description
+      properties:
+        name:
+          title: Name
+          type: string
+          description: The vessel's registry name in lowercase kebab-case (e.g. hms-nyx)
+          pattern: '^[a-z][a-z0-9-]*[a-z0-9]$'
+          ui:autofocus: true
+        # The enum values are the real Backstage lifecycle values; enumNames give
+        # them nautical labels in the form. The chosen value flows into
+        # spec.lifecycle on the vessel's catalog entry.
+        lifecycle:
+          title: Status
+          type: string
+          default: production
+          enum:
+            - experimental
+            - production
+            - deprecated
+          enumNames:
+            - Sea Trials
+            - In Service
+            - Mothballed
+        description:
+          title: Description
+          type: string
+          description: A short description of the vessel and its purpose
+          ui:widget: textarea
+          ui:options:
+            rows: 4
+        # The cargo this vessel is commissioned to carry. It is stamped into the
+        # vessel's deployment and reported by the running service, so a captain
+        # can confirm the vessel sailed with the provisions that were ordered.
+        provisions:
+          title: Provisions
+          type: string
+          description: The cargo this vessel is commissioned to carry
+          default: rum
+          enum:
+            - rum
+            - citrus
+            - spices
+          enumNames:
+            - Rum
+            - Citrus
+            - Spices
+        # Hidden: the EnterParametersTimer field stamps this with the moment the
+        # form opened (captured in the browser). dr:trace-start reads it so the
+        # commission trace can open with the captain's form-fill time. Renders
+        # nothing; the trace still works if it is absent.
+        enterParametersStart:
+          type: string
+          ui:field: EnterParametersTimer
+
+    - title: Fleet Assignment
+      required:
+        - owner
+        - system
+      properties:
+        owner:
+          title: Owning Squadron
+          type: string
+          description: The squadron responsible for the vessel
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: Group
+              spec.type: squadron
+        system:
+          title: Fleet
+          type: string
+          description: The fleet this vessel sails with
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind: System
+
+  # The commissioning procedure, run step by step in the scaffolder backend.
+  # Two repos come out of this: the vessel's code, and its deployment
+  # manifests. Keeping them separate is what lets the delivery pipeline bump a
+  # deploy repo's image tag without ever touching the vessel's source.
+  # 📖 Scaffolder actions and their inputs/outputs (fetch:template, publish:gitea, catalog:register):
+  #    https://backstage.io/docs/features/software-templates/builtin-actions
+  steps:
+    # Open the commission log: mint the trace that follows this vessel from the
+    # office all the way to open water, and hand back its traceparent so the
+    # delivery pipeline can continue it.
+    - id: trace-start
+      name: Open the commission log
+      action: dr:trace-start
+      input:
+        vessel: ${{ parameters.name }}
+        # Recorded on the trace as provisions.ordered, to sit beside the
+        # provisions.delivered the delivery pipeline reads back off the vessel.
+        provisions: ${{ parameters.provisions }}
+        # The captain's form-fill time, drawn as the "enter parameters" bar.
+        enterStart: ${{ parameters.enterParametersStart }}
+
+    # Draft the vessel's deployment manifests: a plain Deployment + Service,
+    # starting on a ":pending" image tag until the delivery pipeline bumps it.
+    - id: fetch-deploy
+      name: Draft the vessel's deployment manifests
+      action: fetch:template
+      input:
+        url: ./content/deploy
+        targetPath: ./deploy
+        values:
+          name: ${{ parameters.name }}
+          provisions: ${{ parameters.provisions }}
+
+    # Open the deployment repository first, so its URL is known when we write the
+    # code's catalog-info.yaml (which links to it). The "-deploy" suffix is the
+    # convention the delivery pipeline's loop-prevention filter and Argo CD's
+    # ApplicationSet both key off of.
+    - id: publish-deploy
+      name: File the deployment manifests in the archives
+      action: publish:gitea
+      input:
+        repoUrl: localhost:30112?owner=fleet&repo=${{ parameters.name }}-deploy
+        description: "Deployment manifests for ${{ parameters.name }}"
+        defaultBranch: main
+        sourcePath: ./deploy
+        # Carry the commission's traceparent in the initial commit message. The
+        # delivery pipeline (via the Argo Events Sensor) reads this trailer off
+        # the push, so the shipyard's and harbor master's spans join this same
+        # trace. It rides only on this first commit and never clutters the repo.
+        gitCommitMessage: |
+          Commission ${{ parameters.name }}
+
+          Traceparent: ${{ steps['trace-start'].output.traceparent }}
+
+    # Draft the vessel's papers: the Go service source that will become the
+    # code repo. deployUrl flows into catalog-info.yaml so the vessel's page can
+    # link to its deployment repository.
+    - id: fetch-code
+      name: Draft the vessel's papers
+      action: fetch:template
+      input:
+        url: ./content/code
+        targetPath: ./code
+        values:
+          name: ${{ parameters.name }}
+          lifecycle: ${{ parameters.lifecycle }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          deployUrl: ${{ steps['publish-deploy'].output.remoteUrl }}
+
+    # Open the code repository in the archives, fixed to the fleet org. The
+    # delivery pipeline's webhook is registered on that org, so anything filed
+    # here is covered automatically, with no extra registration step.
+    - id: publish-code
+      name: File the code in the archives
+      action: publish:gitea
+      input:
+        repoUrl: localhost:30112?owner=fleet&repo=${{ parameters.name }}
+        description: ${{ parameters.description }}
+        defaultBranch: main
+        sourcePath: ./code
+
+    # Enter the vessel into the fleet registry: register the code repo's
+    # catalog-info.yaml in the catalog. Only the code repo is registered as a
+    # Component; the deploy repo has no catalog presence of its own.
+    - id: register
+      name: Enter into the registry
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish-code'].output.repoContentsUrl }}
+        # Relative (no leading slash) on purpose: a leading slash makes Gitea's
+        # resolveUrl mis-parse the /src/branch/<branch>/ path and drop the branch.
+        catalogInfoPath: catalog-info.yaml
+
+    # Close the commission log: the office's part of the voyage is done. The
+    # delivery pipeline continues the same trace from here via the push.
+    - id: trace-finish
+      name: Close the commission log
+      action: dr:trace-finish
+
+  # Shown to the captain once the vessel is commissioned.
+  # 📖 Outputs, and referencing a step's outputs with ${{ steps... }}:
+  #    https://backstage.io/docs/features/software-templates/writing-templates/#outputs
+  output:
+    links:
+      # The vessel's catalog page links out to both repositories and its live
+      # Argo CD / delivery status, so a single link to the new entry is enough.
+      - title: Open the vessel in the catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

@@ -1,0 +1,20 @@
+# Entry point for the fleet's git pushes. Gitea's org webhook POSTs every push
+# here, and Argo Events turns each one into an event the Sensor (sensor.yaml)
+# reacts to. The controller auto-creates a Service from spec.service; its DNS
+# name is the webhook URL Gitea targets:
+#   http://gitea-webhook-eventsource-svc.argo-events.svc.cluster.local:12000/push
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: gitea-webhook
+  namespace: argo-events
+spec:
+  service:
+    ports:
+      - port: 12000
+        targetPort: 12000
+  webhook:
+    push:
+      port: "12000"
+      endpoint: /push
+      method: POST

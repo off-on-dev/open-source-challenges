@@ -1,0 +1,60 @@
+{
+  "name": "🧭 Dead Reckoning | 🔴 Expert (The Chronometer)",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/dead-reckoning/expert",
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "16gb"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/dead-reckoning_expert/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/dead-reckoning_expert/post-start.sh",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "backstage/templates/vessel-commissioning-template/template.yaml",
+        "platform/argo-events/sensor.yaml",
+        "platform/argo-workflows/workflow-template.yaml",
+        "backstage/templates/vessel-commissioning-template/content/code/main.go"
+      ],
+      "permissions": {
+        "codespaces": "write"
+      }
+    }
+  },
+  "forwardPorts": [3000, 7007, 30112, 30100, 30113, 30103],
+  "portsAttributes": {
+    "3000": {
+      "label": "Backstage",
+      "onAutoForward": "notify"
+    },
+    "7007": {
+      "label": "Backstage Backend",
+      "onAutoForward": "silent"
+    },
+    "30112": {
+      "label": "Gitea",
+      "onAutoForward": "notify"
+    },
+    "30100": {
+      "label": "Argo CD",
+      "onAutoForward": "silent"
+    },
+    "30113": {
+      "label": "Argo Workflows",
+      "onAutoForward": "silent"
+    },
+    "30103": {
+      "label": "Jaeger",
+      "onAutoForward": "notify"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

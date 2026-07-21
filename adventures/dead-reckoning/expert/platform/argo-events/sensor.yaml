@@ -1,0 +1,76 @@
+# Reacts to push events from the EventSource and submits a delivery workflow
+# (ci-build) for the pushed repo.
+#
+# Loop prevention: the workflow's last step commits a tag bump to
+# "<vessel>-deploy", which would re-fire this Sensor forever. The filter below
+# drops any repo whose name ends in "-deploy".
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: ci-trigger
+  namespace: argo-events
+spec:
+  template:
+    serviceAccountName: sensor-trigger
+  dependencies:
+    - name: gitea-push
+      eventSourceName: gitea-webhook
+      eventName: push
+      filters:
+        data:
+          # For string values the comparator is a regex, so "!=" means "must
+          # not match": passes only when the repo name doesn't end in "-deploy".
+          - path: body.repository.name
+            type: string
+            comparator: "!="
+            value:
+              - "-deploy$"
+  triggers:
+    - template:
+        name: ci-build
+        argoWorkflow:
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: ci-build-
+                namespace: argo-workflows
+                labels:
+                  # Stamped with the vessel (repo) name below, so the vessel's
+                  # page in Backstage can list just its own builds.
+                  vessel: placeholder
+              spec:
+                workflowTemplateRef:
+                  name: ci-build
+                arguments:
+                  parameters:
+                    # Overwritten per-push from the event by the parameters below.
+                    - name: repo-name
+                      value: placeholder
+                    # The commission's W3C traceparent, pulled from the push
+                    # commit's "Traceparent:" trailer below. Empty for any push
+                    # without the trailer, which just yields an untraced run.
+                    - name: traceparent
+                      value: ""
+          parameters:
+            # Thread the pushed repo's name into the workflow's repo-name param
+            # so the build knows which vessel to clone and build.
+            - src:
+                dependencyName: gitea-push
+                dataKey: body.repository.name
+              dest: spec.arguments.parameters.0.value
+            # Pull the traceparent out of the commit message trailer the
+            # commissioning template wrote, and thread it into the workflow so
+            # every span the pipeline emits joins the commission's trace.
+            - src:
+                dependencyName: gitea-push
+                dataTemplate: '{{ .Input.body.head_commit.message | regexFind "Traceparent: [0-9a-f-]+" | trimPrefix "Traceparent: " }}'
+                value: ""
+              dest: spec.arguments.parameters.1.value
+            # ...and onto the "vessel" label the Backstage card filters on.
+            - src:
+                dependencyName: gitea-push
+                dataKey: body.repository.name
+              dest: metadata.labels.vessel

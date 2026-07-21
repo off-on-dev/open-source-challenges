@@ -1,0 +1,13 @@
+# Exposes the vessel's Deployment inside the cluster. Reach it with
+# `kubectl port-forward svc/${{ values.name }} 8080:8080` once it's running.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${{ values.name }}
+  namespace: default
+spec:
+  selector:
+    app: ${{ values.name }}
+  ports:
+    - port: 8080
+      targetPort: 8080

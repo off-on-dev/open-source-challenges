@@ -1,0 +1,58 @@
+# Closes the loop: auto-discovers a deploy Application for every
+# "<vessel>-deploy" repo in the fleet org, with no per-vessel registration.
+# Commission another vessel and its Application just appears on the next scan.
+#
+# Two concerns: the generator decides WHICH repos become Applications; the
+# template decides HOW each one is synced.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: fleet-vessels
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - scmProvider:
+        gitea:
+          owner: fleet
+          # In-cluster address: the controller and the Apps it creates run in
+          # the cluster, not on the host.
+          api: http://gitea-http.gitea.svc.cluster.local:3000
+          # Fleet repos are public, so no token is needed to list or clone them.
+          allBranches: false
+        filters:
+          # Only deploy repos become Apps; code repos have no manifests.
+          - repositoryMatch: '-deploy$'
+        # How often to rescan the org for new/removed deploy repos.
+        requeueAfterSeconds: 15
+  template:
+    metadata:
+      name: '{{ .repository }}'
+    spec:
+      project: default
+      source:
+        # Build the in-cluster HTTP clone URL from the repo name rather than
+        # using the generator's {{ .url }}: Gitea hands back an SSH URL, and
+        # Argo CD's repo-server has no SSH agent. This is the same address the
+        # delivery workflow clones from.
+        repoURL: 'http://gitea-http.gitea.svc.cluster.local:3000/fleet/{{ .repository }}'
+        targetRevision: '{{ .branch }}'
+        path: .
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: default
+      # A vessel's deployment should reconcile on its own: once the
+      # ApplicationSet discovers its deploy repo, the Application should sync into
+      # the cluster and keep tracking that repo as the delivery workflow bumps the
+      # image, with no one clicking "sync". (It briefly runs the ":pending" image
+      # until the first build pushes a real tag.)
+      syncPolicy:
+        # Reconcile on its own: sync as soon as the ApplicationSet discovers the
+        # deploy repo, and keep tracking it as the delivery workflow bumps the
+        # image tag, with no manual "sync". selfHeal also recovers the initial
+        # ":pending" pod once the first real image lands.
+        automated:
+          selfHeal: true
+          prune: true
+        syncOptions:
+          - CreateNamespace=true

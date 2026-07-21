@@ -1,0 +1,45 @@
+# The single place every span passes through on its way to Jaeger. The commission
+# office (Backstage) and the delivery pipeline (Argo Workflows, Argo CD) all send
+# their spans here over OTLP, and this collector forwards them to Jaeger, where a
+# whole commission shows up as one trace.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: collector-config
+  namespace: otel
+  labels:
+    app: collector
+data:
+  collector-config.yaml: |
+    # Where spans come in: OTLP over gRPC (4317) and HTTP (4318). Backstage on the
+    # host reaches the HTTP port through the collector's NodePort (30107).
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+    exporters:
+      # Where spans go: Jaeger's OTLP endpoint. On this level's Jaeger chart
+      # (4.11.1) that is the "jaeger" service in the jaeger namespace.
+      otlp:
+        endpoint: jaeger.jaeger.svc.cluster.local:4317
+        tls:
+          insecure: true
+      # Also print spans to the collector's own log, handy when debugging why a
+      # trace is or isn't arriving.
+      debug:
+        verbosity: detailed
+
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+
+    service:
+      extensions: [health_check]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [debug, otlp]

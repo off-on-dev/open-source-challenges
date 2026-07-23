@@ -1,0 +1,36 @@
+slug: adventure-accessibility-nightmare
+name: "The Accessibility Nightmare"
+emoji: "♿"
+
+tags:
+  - Accessibility
+  - WCAG 2.2
+  - React
+  - Playwright
+  - axe-core
+  - Lighthouse
+
+backstory:
+  - >-
+    ShopSmart's European expansion is blocked by accessibility complaints and
+    possible ADA and European Accessibility Act penalties.
+  - >-
+    As the lead frontend engineer, you must audit the storefront, repair
+    accessibility failures, and build safeguards that prevent future regressions.
+
+overview:
+  - >-
+    Investigate a deliberately inaccessible e-commerce experience and improve it
+    using React, axe-core, Playwright, Lighthouse, semantic HTML, keyboard testing,
+    and visible focus management.
+  - >-
+    The infrastructure is pre-provisioned in the Dev Container so you can focus
+    on diagnosing and fixing the accessibility problems.
+
+rewards:
+  deadline: "" # TODO: fill in once the adventure goes live
+  tiers:
+    - label: "1st place"
+      description: "Complete every published level and submit a verified solution."
+    - label: "Top 3"
+      description: "Finish the adventure with all verification checks passing."

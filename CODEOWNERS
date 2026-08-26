@@ -1,0 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Dynatrace LLC
+# SPDX-License-Identifier: MIT
+
+# Your CODEOWNERS rules below
+* @off-on-dev/core-maintainers

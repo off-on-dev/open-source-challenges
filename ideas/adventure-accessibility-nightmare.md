@@ -2,15 +2,15 @@
 
 ## Overview
 
-**Theme:** ShopSmart's e-commerce expansion is blocked by ADA lawsuits and strict European Accessibility Act (EAA) fines. As the lead frontend engineer, your mission is to audit the broken site, build an accessible component library, and automate compliance to save the EU launch and protect the company from millions in fines.
+**Theme:** ShopSmart is an online retailer moving into the European market, and support has traced a run of abandoned orders back to the storefront itself. Customers who navigate by keyboard cannot reach the main menu or start an order, and customers using a screen reader are never told what the product images show or why the checkout form rejects them. There is no second route to a purchase. Complaints reached the company, then a legal notice citing the ADA and the European Accessibility Act, and the EU launch is on hold until the storefront can be shown to work. As the lead frontend engineer, your mission is to audit the storefront, fix what blocks these customers, and add checks that stop the same faults shipping again.
 
 **Skills:**
 
 - Audit and remediate critical WCAG 2.2 violations using automated and manual testing tools
-- Build and document an accessible component library with proper focus management and ARIA patterns
-- Implement automated accessibility gates and performance budgets in CI/CD pipelines to ensure continuous compliance
+- Repair focus management, ARIA patterns, and error announcement in shared interface components
+- Implement automated accessibility gates that cover what static scanning misses
 
-**Technologies:** axe-core, Lighthouse, Playwright, Pa11y, NVDA, VoiceOver, React, Storybook, GitHub Actions
+**Technologies:** React, Playwright, axe-core, Lighthouse, Guidepup Virtual Screen Reader, eslint-plugin-jsx-a11y
 
 ---
 
@@ -41,46 +41,45 @@ The homepage is riddled with basic accessibility failures. It currently scores a
 
 - How to interpret automated accessibility reports (Lighthouse, axe-core)
 - The fundamentals of WCAG 2.2 perceivable and operable criteria
-- How to test and fix basic keyboard navigation and focus states using screen readers
+- How to test and fix basic keyboard navigation and focus states with Playwright
 
 #### Tools & Infrastructure
 
-- **Tools:** Lighthouse, axe DevTools, NVDA/VoiceOver, Browser DevTools
-- **Infrastructure:** ShopSmart E-commerce Frontend (React/Next.js)
+- **Tools:** Lighthouse, axe-core, Playwright, Browser DevTools
+- **Infrastructure:** ShopSmart E-commerce Frontend (React/Vite)
 
 ---
 
-### 🟡 Intermediate: The Component Forge
+### 🟡 Intermediate: The Checkout Trap
 
 #### Description
 
-Build and document an accessible component library in Storybook to ensure all future features are built correctly from the start.
+Repair the shared checkout components so keyboard and screen reader users can complete a purchase, on a page where the automated scanner already reports no violations.
 
 #### Story
 
-The homepage is fixed, but the rest of the checkout flow is a disaster. The design team keeps using broken, inaccessible patterns, and developers are reinventing the wheel—and breaking accessibility in the process. You need to build a standardized, accessible component library so the team can stop making the same mistakes.
+The homepage is fixed and every automated scan comes back green, so the team declared the problem solved. The complaints kept arriving, and support has traced all of them to the checkout. One customer opens the quick add panel and the keyboard never follows it there. Their next Tab lands somewhere behind the panel, on the page it is covering, and they carry on through controls they can no longer see. Another fills in the delivery details, submits, and is told nothing at all: the error sits on screen in red, and their screen reader never mentions it. The design team keeps shipping these same patterns, and nobody can see the problem, because the scanner insists there isn't one. Fix the checkout before the next batch of complaints reaches legal.
 
 #### The Problem
 
-The current UI kit lacks focus management, uses incorrect ARIA roles, and has no automated testing. Modals trap focus incorrectly, dropdowns aren't navigable by screen readers, and forms lack proper error announcements. Every time a developer builds a new feature, they introduce new accessibility bugs.
+The three checkout components are built out of plain containers dressed up with styling instead of real controls, so automated scanning reports nothing, yet none of them can be used without a mouse. The quick add panel loses track of where the keyboard is as it opens and closes. The size picker cannot be reached or operated from the keyboard, and gives a screen reader nothing to announce. The checkout form rejects a submission in a way a screen reader user never hears.
 
 #### Objective
 
-- Build accessible Modal, Dropdown, and Form components in Storybook
-- Implement strict focus trapping in modals and correct ARIA live regions for form errors
-- Ensure 100% keyboard navigability and correct screen reader announcements for all components
-- Write Playwright accessibility tests for each component to prevent future regressions
+- Complete the checkout end to end using only the keyboard
+- Have every step of that journey announced to a screen reader, including why a submission was rejected
+- Keep the axe-core scan reporting no violations throughout
 
 #### What You'll Learn
 
-- How to implement complex ARIA patterns (dialogs, menus, live regions)
-- How to manage focus programmatically and prevent keyboard traps
-- How to write automated E2E accessibility tests using Playwright
+- How to move, hold and restore focus across a modal boundary, and why hiding the background is not the same as putting it out of reach
+- How a validation failure actually reaches a screen reader user, through live regions and the attributes that bind a message to its field
+- Why an automated scan can report a clean page that no keyboard or screen reader user can operate
 
 #### Tools & Infrastructure
 
-- **Tools:** Storybook, Playwright, axe-core, NVDA/VoiceOver
-- **Infrastructure:** Component Library Repository, ShopSmart Frontend
+- **Tools:** Playwright, Guidepup Virtual Screen Reader (a simulation, not real assistive technology), axe-core
+- **Infrastructure:** ShopSmart E-commerce Frontend with checkout flow (React/Vite)
 
 ---
 
@@ -88,35 +87,29 @@ The current UI kit lacks focus management, uses incorrect ARIA roles, and has no
 
 #### Description
 
-Integrate automated accessibility gates into the CI/CD pipeline and build a monitoring dashboard to uncover hidden regressions and ensure long-term EAA/ADA compliance.
+Repair the automated check that is meant to stop inaccessible code from shipping, and find out why it has never once caught the barrier the company is being sued over.
 
 #### Story
 
-The components are ready, but developers are still bypassing them, and new PRs are introducing regressions. The legal team needs proof of continuous compliance for the EAA audit next week. You must build an automated compliance engine that blocks bad code before it merges, but when you turn it on, it's not catching the issues the lawyers are complaining about. Dig into the pipeline and the production telemetry to find out what's slipping through.
+The components are repaired, and the legal team needs proof of continuous compliance for the EAA audit next week. Every merge already arrives with a green accessibility check attached, and the record says the storefront has been clean for months. But one item on the original legal notice was never reproduced. A customer reached the payment step, and once the keyboard was inside the card fields it never came out again, cycling between them however many times they pressed Tab. They never reached the button to place the order, and the check has never once reported anything there. Work out what that check is really looking at before the auditors arrive.
 
 #### The Problem
 
-Two things are broken before compliance can be proven. First, the CI pipeline's accessibility checks are running too early in the build process, before dynamic client-side content is rendered, so they miss critical violations in the checkout flow. Second, even when fixed to run post-render, the pipeline only checks static pages; it doesn't catch regressions in user-specific flows. 
-
-With proper Playwright E2E accessibility tests finally integrated and running against the fully rendered app, the root cause of the legal complaint becomes clear: a third-party payment widget is injecting inaccessible iframes that break the keyboard flow, which static audits missed. You must implement Real User Monitoring (RUM) to catch these dynamic, third-party regressions in production.
+The check runs on every build and always passes. The trouble is not the rules it applies but where it applies them. It never reaches the pages a customer moves through on the way to paying, and the barrier behind the lawsuit is a fault in how the page behaves rather than in how it is written, so no automated scanner would report it wherever it looked.
 
 #### Objective
 
-- Fix the GitHub Actions pipeline so accessibility checks run against the fully rendered application, not just the static HTML
-- Implement an accessibility performance budget that fails the build if the Lighthouse score drops below 95 or if new axe-core violations are introduced
-- Configure Playwright to test complex, multi-step user flows (like checkout) for accessibility
-- Set up Real User Monitoring (RUM) to track accessibility metrics and third-party widget failures in production
-- Generate an automated compliance report for the legal team proving EAA/ADA adherence
+- Check the page as it appears in a browser, not the file the build produces
+- Catch the barrier on the payment step that no scan has ever reported
+- Prove the check works both ways: it fails a build that carries a known problem and passes one that does not
 
 #### What You'll Learn
 
-- How to integrate accessibility testing into CI/CD pipelines as a hard, post-render gate
-- How to set and enforce accessibility performance budgets
-- How to test complex, multi-step user flows for accessibility using Playwright
-- How to monitor accessibility in production using Real User Monitoring (RUM) to catch dynamic and third-party regressions
-- How to translate technical accessibility metrics into legal compliance reports
+- Why a green accessibility check means nothing until you know which pages and states it actually looked at
+- How reading the source code, scanning the finished page, and driving the page with a keyboard each catch different faults, and why some faults only the last of them can find
+- How a third-party component you cannot change still becomes your own legal problem
 
 #### Tools & Infrastructure
 
-- **Tools:** GitHub Actions, Playwright, Pa11y, Lighthouse CI, OpenTelemetry, Grafana
-- **Infrastructure:** CI/CD Pipeline, Production E-commerce Environment, Monitoring Stack
+- **Tools:** Playwright, axe-core, eslint-plugin-jsx-a11y
+- **Infrastructure:** ShopSmart E-commerce Frontend, checkout flow and vendor payment widget (React/Vite)

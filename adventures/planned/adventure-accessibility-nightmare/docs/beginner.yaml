@@ -4,6 +4,25 @@ title: "The Initial Audit"
 devcontainer: adventure-accessibility-nightmare_beginner
 community_url: "" # TODO: add community thread URL once the adventure is live
 
+topics:
+  - axe-core
+  - Playwright
+  - Lighthouse
+  - WCAG 2.2
+  - React
+
+contributor:
+  name: "Ehtasham Yasin"
+  url: "https://weblight-app.vercel.app"
+  about: >-
+    Full-stack and AI Automation Engineer with 4+ years of frontend experience building React and
+    Next.js applications, API-driven systems, and automated workflows with Docker and n8n.
+    Interested in DevSecOps and open-source development.
+
+meta_description: >-
+  Audit a React storefront for WCAG 2.2 failures with axe-core, Playwright, and Lighthouse.
+  Fix color contrast, alt text, semantic HTML, keyboard navigation, and visible focus indicators.
+
 summary: >-
   Audit the ShopSmart homepage and fix critical WCAG 2.2 accessibility
   violations before the initial compliance review.

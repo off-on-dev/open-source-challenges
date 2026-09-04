@@ -2,6 +2,18 @@ slug: adventure-accessibility-nightmare
 name: "The Accessibility Nightmare"
 emoji: "♿"
 
+contributor:
+  name: "Homayoun Mohammadi"
+  url: "https://homayounmmdy.vercel.app"
+  about: >-
+    Frontend developer with 4+ years building production apps in Next.js, React, and TypeScript.
+    Open-source contributor to projects at Microsoft, W3C, and GitHub. Author of two npm packages:
+    a 12-language RTL text engine and a TypeScript SVG mapping toolkit.
+
+meta_description: >-
+  Learn web accessibility on a React storefront: audit WCAG 2.2 with axe-core and Lighthouse, fix
+  keyboard focus and screen reader announcements, automate testing with Playwright.
+
 tags:
   - Accessibility
   - WCAG 2.2
@@ -12,20 +24,68 @@ tags:
 
 backstory:
   - >-
-    ShopSmart's European expansion is blocked by accessibility complaints and
-    possible ADA and European Accessibility Act penalties.
+    ShopSmart is an online retailer moving into the European market. The redesign
+    brief was explicit: anyone should be able to shop there, on any device, with any
+    input method or assistive technology. Months on, support has traced a run of
+    abandoned orders back to the storefront itself.
   - >-
-    As the lead frontend engineer, you must audit the storefront, repair
-    accessibility failures, and build safeguards that prevent future regressions.
+    Product photos carry no text alternative. Neither described nor marked
+    decorative, they leave a screen reader stopping on each one with nothing to say.
+    The banner image at the top, which no nearby text describes, is silent too.
+  - >-
+    Submitting the checkout form produces a validation error no screen reader will
+    announce. The message sits on screen in red beside its field, but nothing in the
+    markup ties the two together, and nothing tells assistive technology that new
+    text has appeared. The customer knows the order failed and cannot find out why.
+  - >-
+    Others never reach checkout. Someone with a tremor or limited hand movement
+    works from the keyboard instead of a mouse. The main menu cannot be reached that
+    way, and the focus outline is styled off across the site, so anyone on a keyboard
+    has no idea where they are on the page.
+  - >-
+    There is no accessible fallback and no second route to a purchase. Complaints
+    reached the company, then a legal notice citing the ADA and the European
+    Accessibility Act. The EU launch is on hold until the storefront can be shown to
+    work.
+  - >-
+    You are the lead frontend engineer. Audit the storefront, fix what blocks these
+    customers, and add checks that stop the same faults shipping again.
 
 overview:
   - >-
-    Investigate a deliberately inaccessible e-commerce experience and improve it
-    using React, axe-core, Playwright, Lighthouse, semantic HTML, keyboard testing,
-    and visible focus management.
+    Assistive technology works from the semantics a page exposes: what each element
+    is, what it is called, what state it is in, what it belongs to. A screen reader,
+    a switch device and a braille display all read that same layer. Replace a button
+    with a styled div and the information is gone for all of them, and nothing
+    downstream can reconstruct it.
   - >-
-    The infrastructure is pre-provisioned in the Dev Container so you can focus
-    on diagnosing and fixing the accessibility problems.
+    Around 16% of people live with a significant disability. Since June 2025 the
+    European Accessibility Act has put EU e-commerce in legal scope, and the standard
+    it points to, EN 301 549, sets WCAG 2.2 AA as the bar in practice.
+  - >-
+    The premise here is that accessibility is how a page behaves under real use, not
+    what its markup contains. Scanners inspect the rendered DOM and settle only what
+    is statically decidable: a missing alt attribute, a contrast ratio, an ARIA role
+    that contradicts its required children. Whether alt text is meaningful, whether
+    focus order follows the layout, whether an error is announced, whether a widget
+    behaves like the role it claims, none of that is decidable from a snapshot. A
+    page can pass every rule in the ruleset and remain unusable.
+  - >-
+    Three levels cover both sides of that line. The homepage audit takes what
+    scanning does well, contrast ratios and missing text alternatives, then the first
+    thing it cannot see, whether the page works from a keyboard at all. Checkout
+    takes the rest: containers dressed as controls that report clean while stranding
+    a keyboard user behind a modal and swallowing a validation error. The last level
+    turns to the accessibility gate, green for months without once loading the pages
+    a customer pays on.
+  - >-
+    What you leave with is a sense of what each layer of testing can settle. Linting
+    reads source and catches faults before anything renders. Scanning reads the
+    rendered DOM and catches faults in a snapshot. Driving the page with a keyboard
+    catches behavior, and behavior is where the remainder are.
+  - >-
+    The storefront is pre-provisioned in a Dev Container, so the work is the audit,
+    the repairs and the test coverage.
 
 rewards:
   deadline: "" # TODO: fill in once the adventure goes live

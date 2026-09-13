@@ -1,15 +1,15 @@
 {
   "name": "♿ The Accessibility Nightmare | 🟡 Intermediate (The Checkout Trap)",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/adventure-accessibility-nightmare/intermediate",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/accessibility-nightmare/intermediate",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "22"
     },
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_intermediate/post-create.sh",
-  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_intermediate/post-start.sh",
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/accessibility-nightmare_intermediate/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/accessibility-nightmare_intermediate/post-start.sh",
   "customizations": {
     "vscode": {
       "extensions": [

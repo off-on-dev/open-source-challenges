@@ -1,7 +1,7 @@
 level: beginner
 emoji: "🟢"
 title: "The Initial Audit"
-devcontainer: adventure-accessibility-nightmare_beginner
+devcontainer: accessibility-nightmare_beginner
 community_url: "" # TODO: add community thread URL once the adventure is live
 
 topics:
@@ -103,10 +103,10 @@ how_to_play:
   - id: start
     title: "Start ShopSmart"
     content: |
-      Start the application from the repository root:
+      Start the application:
 
       ```bash
-      make accessibility-nightmare-beginner
+      make app
       ```
 
       Then open port 5173 in your browser.

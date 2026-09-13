@@ -9,7 +9,7 @@ SESSION_ID_FILE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/.offon-sess
 
 # -----------------------------------------------------------------------------
 # Set tracking context and ensure a session ID exists
-# Usage: set_tracking_context "lex-imperfecta" "beginner" "05" "June" "2026"
+# Usage: set_tracking_context "lex-imperfecta" "beginner" "05" "06" "2026"
 # -----------------------------------------------------------------------------
 set_tracking_context() {
   local adventure=$1

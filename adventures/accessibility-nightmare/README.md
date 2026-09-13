@@ -9,4 +9,4 @@ The entire **infrastructure is pre-provisioned in your Codespace**
 
 ## 🚀 Ready to Start?
 
-[Choose your level](https://offon.dev/adventures/adventure-accessibility-nightmare/) and begin learning!
+[Choose your level](https://offon.dev/adventures/accessibility-nightmare/) and begin learning!

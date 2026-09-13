@@ -1,7 +1,7 @@
 level: intermediate
 emoji: "🟡"
 title: "The Checkout Trap"
-devcontainer: adventure-accessibility-nightmare_intermediate
+devcontainer: accessibility-nightmare_intermediate
 community_url: "" # TODO: add community thread URL once the adventure is live
 
 topics:
@@ -135,10 +135,10 @@ how_to_play:
     title: "Start ShopSmart"
     content: |
       The storefront is already running in your Codespace. If you need to start
-      it yourself, run this from the repository root:
+      it yourself:
 
       ```bash
-      make accessibility-nightmare-intermediate
+      make app
       ```
 
       Then open port 5173 and go to the product page:

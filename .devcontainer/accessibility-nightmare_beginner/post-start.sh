@@ -2,9 +2,9 @@
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-CHALLENGE_DIR="$REPO_ROOT/adventures/planned/adventure-accessibility-nightmare/intermediate"
+CHALLENGE_DIR="$REPO_ROOT/adventures/accessibility-nightmare/beginner"
 
-echo "✨ Starting The Accessibility Nightmare - Intermediate Level"
+echo "✨ Starting The Accessibility Nightmare - Beginner Level"
 
 cd "$CHALLENGE_DIR"
 
@@ -28,15 +28,10 @@ if ! curl --fail --silent http://127.0.0.1:5173 >/dev/null; then
   if [[ -f "$LOG_FILE" ]]; then
     tail -n 20 "$LOG_FILE"
   fi
-  echo "Run 'npm run dev' from the intermediate directory to start it manually."
+  echo "Run 'npm run dev' from the beginner directory to start it manually."
   exit 1
 fi
-
-echo ""
-echo "🛒 The checkout is on the product page: http://localhost:5173/#/product/running-shoes"
-echo ""
-
 # shellcheck disable=SC1091
 source "$REPO_ROOT/lib/scripts/tracker.sh"
-set_tracking_context "adventure-accessibility-nightmare" "intermediate" "" "TODO" "TODO"
+set_tracking_context "accessibility-nightmare" "beginner" "07" "09" "2026"
 track_container_initialized

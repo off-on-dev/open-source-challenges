@@ -5,9 +5,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/../../../../lib/scripts/loader.sh"
+source "$SCRIPT_DIR/../../../lib/scripts/loader.sh"
 
-set_tracking_context "adventure-accessibility-nightmare" "intermediate" "" "TODO" "TODO"
+set_tracking_context "accessibility-nightmare" "intermediate" "07" "09" "2026"
 
 OBJECTIVE="
 - Complete the checkout end to end using only the keyboard.
@@ -15,7 +15,7 @@ OBJECTIVE="
 - Rebuild the size picker as a select-only combobox, so it exposes a role, a name and the size that is chosen.
 - Keep the axe-core scan reporting no violations throughout."
 
-DOCS_URL="https://offon.dev/adventures/adventure-accessibility-nightmare/levels/intermediate"
+DOCS_URL="https://offon.dev/adventures/accessibility-nightmare/levels/intermediate"
 
 # The exercise is understanding what a headless UI library does for you, so the
 # dependency set is fixed for the duration.
@@ -77,7 +77,7 @@ fi
 
 if [[ $TESTS_FAILED -gt 0 ]]; then
   track_verification_completed "failed" "$failed_checks_json"
-  print_verification_summary "adventure-accessibility-nightmare" "$DOCS_URL" "$OBJECTIVE"
+  print_verification_summary "accessibility-nightmare" "$DOCS_URL" "$OBJECTIVE"
   exit 1
 fi
 
@@ -87,4 +87,4 @@ print_header "Test Results Summary"
 print_success "✅ PASSED: All $TESTS_PASSED verification checks passed!"
 print_new_line
 
-check_submission_readiness "adventure-accessibility-nightmare" "intermediate"
+check_submission_readiness "accessibility-nightmare" "intermediate"

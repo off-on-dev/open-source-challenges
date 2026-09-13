@@ -1,3 +1,10 @@
+// Lighthouse needs a Chrome binary. Playwright already downloaded one during
+// container setup, so point Lighthouse at that instead of expecting a
+// system-wide Chrome install.
+const { chromium } = require('playwright');
+
+process.env.CHROME_PATH = process.env.CHROME_PATH || chromium.executablePath();
+
 module.exports = {
     ci: {
         collect: {

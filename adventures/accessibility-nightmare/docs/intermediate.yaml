@@ -11,6 +11,14 @@ topics:
   - WCAG 2.2
   - React
 
+contributor:
+  name: "Sinduri Guntupalli"
+  url: "https://sinduri.lol/"
+  about: >-
+    Experienced in product and program management, web development, configuration management,
+    web analytics, SEO, and community and ecosystem management. Passionate about open source
+    with active involvement in the Drupal community.
+
 meta_description: >-
   Repair a React checkout that passes every automated accessibility scan and still cannot be used.
   Focus management across a modal, the ARIA combobox pattern, and live-region error announcement,

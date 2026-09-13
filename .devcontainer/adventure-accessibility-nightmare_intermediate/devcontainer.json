@@ -1,0 +1,42 @@
+{
+  "name": "♿ The Accessibility Nightmare | 🟡 Intermediate (The Checkout Trap)",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/adventure-accessibility-nightmare/intermediate",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_intermediate/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_intermediate/post-start.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-playwright.playwright"
+      ]
+    },
+    "codespaces": {
+      "openFiles": [
+        "src/components/SizePicker.jsx",
+        "src/components/BasketDialog.jsx",
+        "src/components/CheckoutForm.jsx"
+      ],
+      "permissions": {
+        "codespaces": "write"
+      }
+    }
+  },
+  "forwardPorts": [
+    5173
+  ],
+  "portsAttributes": {
+    "5173": {
+      "label": "ShopSmart",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
+  }
+}

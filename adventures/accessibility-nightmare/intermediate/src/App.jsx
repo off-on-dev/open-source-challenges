@@ -7,7 +7,9 @@ import { findProduct } from './products.js';
 const PRODUCT_ROUTE = /^\/product\/([\w-]+)$/;
 
 function readRoute() {
-    return window.location.hash.replace(/^#/, '') || '/';
+    // Anything after a "?" in the hash is a flag rather than part of the route.
+    const [path] = window.location.hash.replace(/^#/, '').split('?');
+    return path || '/';
 }
 
 export default function App() {

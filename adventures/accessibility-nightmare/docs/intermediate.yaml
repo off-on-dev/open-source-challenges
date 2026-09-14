@@ -192,7 +192,15 @@ how_to_play:
       and what happens when you press Escape. Then go on to the checkout and
       submit the form empty.
 
-      To hear what a screen reader would say at each of those steps:
+      To watch it live while you work, add `?listen` to the address. It can go
+      either side of the route, so appending it to whatever is in your address
+      bar works:
+
+      ```text
+      http://localhost:5173/#/product/running-shoes?listen
+      ```
+
+      Or to print the same journey in the terminal:
 
       ```bash
       npm run listen

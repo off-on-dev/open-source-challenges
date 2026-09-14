@@ -18,9 +18,9 @@
     },
     "codespaces": {
       "openFiles": [
-        "src/components/SizePicker.jsx",
+        "src/components/CheckoutForm.jsx",
         "src/components/BasketDialog.jsx",
-        "src/components/CheckoutForm.jsx"
+        "src/components/SizePicker.jsx"
       ],
       "permissions": {
         "codespaces": "write"

@@ -75,7 +75,8 @@ what_you_learn:
     [select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/).
   - >-
     How a validation failure actually reaches a screen reader user, through
-    [live regions](https://www.w3.org/WAI/ARIA/apg/practices/live-regions/) and
+    [live regions](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions)
+    and
     the attributes that bind a message to its field.
   - >-
     Why an automated scan can report a clean page that no keyboard or screen
@@ -85,8 +86,8 @@ what_you_learn:
 architecture:
   - >-
     A React and Vite storefront runs on port 5173 inside the Dev Container. The
-    homepage arrives with the beginner level's repairs already applied; the
-    checkout on the product page does not.
+    homepage arrives with the beginner level's repairs already applied. The
+    product page and the checkout do not.
   - >-
     Buying something takes two pages. On /#/product/running-shoes you choose a
     size and add the item to your basket, which opens a confirmation. From there
@@ -206,10 +207,10 @@ how_to_play:
       npm run listen
       ```
 
-      That walks the same journey and prints the announcements, marking any
-      step that produced nothing at all. It grades nothing. Use it as often as
-      you like while you work, and run it again after each repair to see what
-      changed.
+      That walks the same journey and prints the announcements, naming any step
+      that changed the page without telling anyone about it. It grades nothing.
+      Use it as often as you like, and run it again after each repair to see
+      what changed.
 
   - id: implement
     title: "Repair the Checkout"

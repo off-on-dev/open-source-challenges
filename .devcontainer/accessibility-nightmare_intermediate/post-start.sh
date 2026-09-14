@@ -37,7 +37,8 @@ if ! curl --fail --silent http://127.0.0.1:5173 >/dev/null; then
 fi
 
 echo ""
-echo "🛒 The checkout is on the product page: http://localhost:5173/#/product/running-shoes"
+echo "🛒 Start on the product page: http://localhost:5173/#/product/running-shoes"
+echo "   Add to basket there, then the checkout is at /#/checkout"
 echo ""
 
 # shellcheck disable=SC1091

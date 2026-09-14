@@ -214,14 +214,17 @@ how_to_play:
   - id: implement
     title: "Repair the Checkout"
     content: |
+      Take them smallest first. The checkout form is a handful of attributes and
+      two elements, the basket confirmation is a known pattern, and the size
+      picker is a component to build. Doing them in that order gets you three
+      separate wins before the long one.
+
       Work in:
 
       ```text
-      src/components/SizePicker.jsx
-      src/components/BasketDialog.jsx
       src/components/CheckoutForm.jsx
-      src/pages/Product.jsx
-      src/pages/Checkout.jsx
+      src/components/BasketDialog.jsx   with src/pages/Product.jsx
+      src/components/SizePicker.jsx
       ```
 
       One thing is worth knowing before you start, because it costs hours and

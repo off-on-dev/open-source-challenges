@@ -7,6 +7,7 @@ import {
     STARTING_SIZE,
     activeOptionName,
     addToBasket,
+    assertPickerShape,
     addWithMouse,
     basketDialog,
     checkoutLink,
@@ -99,6 +100,7 @@ test('@picker the size picker announces its name, its state and its value', asyn
     await page.goto(PRODUCT_URL);
     await startScreenReader(page);
 
+    await assertPickerShape(page);
     await clearSpokenPhrases(page);
     await tabTo(page, sizePicker(page));
     await settle(page);
@@ -139,6 +141,7 @@ test('@picker the size picker announces its name, its state and its value', asyn
 test('@picker the open list of sizes still scans clean', async ({ page }) => {
     await page.goto(PRODUCT_URL);
 
+    await assertPickerShape(page);
     await tabTo(page, sizePicker(page));
     await page.keyboard.press('ArrowDown');
     await expect(page.getByRole('listbox')).toBeVisible();

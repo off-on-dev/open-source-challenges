@@ -32,6 +32,26 @@ export function placeOrder(page) {
 export const NO_DIALOG =
     'The basket confirmation covers the page, but nothing tells assistive technology that a dialog opened.';
 
+const NATIVE_SELECT =
+    'The size picker is a native <select>. On real work that is the right answer, ' +
+    'and it is accessible as it stands. It is out of scope here because the point ' +
+    'of the exercise is understanding what a native control does for you, so build ' +
+    'the select-only combobox instead: ' +
+    'https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/';
+
+const NO_PICKER =
+    'No control on the product page presents itself as a size picker. It needs a ' +
+    'role, an accessible name and its current value.';
+
+// Fails with an explanation when the picker is a native <select>, which passes
+// every accessibility check but is deliberately not what this level asks for.
+export async function assertPickerShape(page) {
+    const nativeSelect = await page
+        .locator('.size-picker select, select')
+        .count();
+    expect(nativeSelect, NATIVE_SELECT).toBe(0);
+}
+
 // Presses Tab until the target has focus. Fails with the tab order it walked
 // through, which is the useful part when a control cannot be reached at all.
 export async function tabTo(page, target, limit = 15) {
@@ -92,10 +112,8 @@ export async function activeOptionName(page) {
 // the keyboard. Returns the size that was committed.
 export async function chooseAnotherSize(page) {
     const picker = sizePicker(page);
-    expect(
-        await picker.count(),
-        'No control on the product page presents itself as a size picker.',
-    ).toBeGreaterThan(0);
+    await assertPickerShape(page);
+    expect(await picker.count(), NO_PICKER).toBeGreaterThan(0);
     await tabTo(page, picker);
 
     await page.keyboard.press('ArrowDown');

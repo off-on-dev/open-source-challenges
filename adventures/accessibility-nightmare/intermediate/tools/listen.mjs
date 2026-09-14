@@ -44,24 +44,44 @@ await attachScreenReader(page);
 await page.goto(`${BASE}/#/product/running-shoes`, { waitUntil: 'networkidle' });
 await startScreenReader(page);
 
-let silences = 0;
+const unheard = [];
 
-async function step(what, action) {
+// `expects` says this step changes something on screen without moving focus
+// there, so a screen reader only learns about it from a live region. Saying
+// nothing and saying the wrong thing both leave the user uninformed, and only
+// the first shows up as an empty log.
+async function step(what, action, { expects } = {}) {
     await clearSpokenPhrases(page);
     await action();
     await settle(page);
     const heard = await spokenPhrases(page);
 
     console.log(`\n${bold(what)}`);
+
     if (heard.length === 0) {
-        silences += 1;
         console.log(`  ${red('(silence)')}`);
-        return;
+    } else {
+        for (const phrase of heard) {
+            const live = /^(polite|assertive):/.test(phrase);
+            console.log(`  ${live ? green(phrase) : phrase}`);
+        }
     }
-    for (const phrase of heard) {
-        const live = /^(polite|assertive):/.test(phrase);
-        console.log(`  ${live ? green(phrase) : phrase}`);
+
+    if (!expects) return;
+
+    const announced = heard.some((phrase) => expects.test(phrase));
+    if (!announced) {
+        unheard.push(what);
+        console.log(`  ${red(`\u2192 nothing here announced ${expects.label}`)}`);
     }
+}
+
+// Attach a human-readable name to each pattern so the arrow line reads as
+// English rather than as a regular expression.
+function expecting(label, pattern) {
+    const re = new RegExp(pattern, 'i');
+    re.label = label;
+    return re;
 }
 
 console.log(bold('\nWhat a screen reader would announce'));
@@ -71,9 +91,13 @@ await step('Tabbing through the product page', async () => {
     for (let i = 0; i < 6; i += 1) await page.keyboard.press('Tab');
 });
 
-await step('Adding the item to the basket', async () => {
-    await page.getByRole('button', { name: 'Add to basket' }).click();
-});
+await step(
+    'Adding the item to the basket',
+    async () => {
+        await page.getByRole('button', { name: 'Add to basket' }).click();
+    },
+    { expects: expecting('that a dialog opened', 'dialog') },
+);
 
 await step('Pressing Escape on the confirmation', async () => {
     await page.keyboard.press('Escape');
@@ -81,25 +105,34 @@ await step('Pressing Escape on the confirmation', async () => {
 
 await page.goto(`${BASE}/#/checkout`, { waitUntil: 'networkidle' });
 
-await step('Submitting the checkout form with nothing filled in', async () => {
-    await page.getByRole('button', { name: 'Place order' }).click();
-});
+await step(
+    'Submitting the checkout form with nothing filled in',
+    async () => {
+        await page.getByRole('button', { name: 'Place order' }).click();
+    },
+    { expects: expecting('why the order was rejected', '^(polite|assertive):') },
+);
 
-await step('Filling the fields in and submitting again', async () => {
-    await page.getByLabel('Full name').fill('Ada Lovelace');
-    await page.getByLabel('Email').fill('ada@example.com');
-    await page.getByRole('button', { name: 'Place order' }).click();
-});
+await step(
+    'Filling the fields in and submitting again',
+    async () => {
+        await page.getByLabel('Full name').fill('Ada Lovelace');
+        await page.getByLabel('Email').fill('ada@example.com');
+        await page.getByRole('button', { name: 'Place order' }).click();
+    },
+    { expects: expecting('that the order went through', '^(polite|assertive):') },
+);
 
 console.log(
     `\n${dim('Announcements from a live region are prefixed polite: or assertive:')}`,
 );
-if (silences > 0) {
+if (unheard.length > 0) {
     console.log(
         red(
-            `${silences} step${silences === 1 ? '' : 's'} said nothing at all.`,
+            `${unheard.length} step${unheard.length === 1 ? '' : 's'} changed the page without telling anyone:`,
         ),
     );
+    for (const what of unheard) console.log(red(`  ${what}`));
 }
 console.log();
 

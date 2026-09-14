@@ -37,8 +37,9 @@ if ! curl --fail --silent http://127.0.0.1:5173 >/dev/null; then
 fi
 
 echo ""
-echo "🛒 Start on the product page: http://localhost:5173/#/product/running-shoes"
-echo "   Add to basket there, then the checkout is at /#/checkout"
+echo "🛒 Open the Ports tab, click ShopSmart on 5173, then add the route:"
+echo "     /#/product/running-shoes    choose a size and add to basket"
+echo "     /#/checkout                 place the order"
 echo ""
 
 # shellcheck disable=SC1091

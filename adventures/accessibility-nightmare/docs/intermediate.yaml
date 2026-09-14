@@ -136,30 +136,30 @@ toolbox:
 
 services:
   - name: "ShopSmart"
-    url: "http://localhost:5173"
+    port: 5173
     description: "The storefront. The product page is at /#/product/running-shoes and the checkout at /#/checkout."
 
 how_to_play:
   - id: start
     title: "Start ShopSmart"
     content: |
-      The storefront is already running in your Codespace. If you need to start
-      it yourself:
+      The storefront is already running. Open the **Ports** tab in the editor,
+      find **ShopSmart** on port 5173, and click the globe icon to open it in a
+      browser tab. Codespaces serves it from an address ending in
+      `.app.github.dev`, so there is no localhost to visit.
 
-      ```bash
-      make app
-      ```
+      If it is not running, start it from the level directory with `make app`.
 
-      Then open port 5173 and go to the product page:
+      Add the product route to whatever address the Ports tab gave you:
 
       ```text
-      http://localhost:5173/#/product/running-shoes
+      <your-codespace>-5173.app.github.dev/#/product/running-shoes
       ```
 
-      Open it in a browser tab. The editor's built-in preview cannot load the
-      forwarded port while the port is private, because the request is sent
-      through GitHub's authentication and a preview pane has no way to complete
-      that.
+      Use a browser tab rather than the editor's built-in preview. The preview
+      cannot load the forwarded port while it is private, because the request is
+      sent through GitHub's authentication and a preview pane has no way to
+      complete that.
 
       If you would rather work inside the preview, make the port public first:
       in the Ports panel, right-click ShopSmart, choose Port Visibility, then
@@ -193,12 +193,11 @@ how_to_play:
       and what happens when you press Escape. Then go on to the checkout and
       submit the form empty.
 
-      To watch it live while you work, add `?listen` to the address. It can go
-      either side of the route, so appending it to whatever is in your address
-      bar works:
+      To watch it live while you work, add `?listen` to the end of whatever is
+      in your address bar. It works either side of the route:
 
       ```text
-      http://localhost:5173/#/product/running-shoes?listen
+      <your-codespace>-5173.app.github.dev/#/product/running-shoes?listen
       ```
 
       Or to print the same journey in the terminal:

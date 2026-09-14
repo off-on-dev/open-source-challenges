@@ -155,9 +155,15 @@ how_to_play:
       http://localhost:5173/#/product/running-shoes
       ```
 
-      Open it in a browser tab rather than the editor's built-in preview. The
-      preview cannot load a private forwarded port, and you will want a real
-      browser for this level anyway.
+      Open it in a browser tab. The editor's built-in preview cannot load the
+      forwarded port while the port is private, because the request is sent
+      through GitHub's authentication and a preview pane has no way to complete
+      that.
+
+      If you would rather work inside the preview, make the port public first:
+      in the Ports panel, right-click ShopSmart, choose Port Visibility, then
+      Public, and reload the preview. A public port can be reached by anyone who
+      has the URL, so turn it back to Private when you are finished.
 
       **On a Mac, turn keyboard navigation on before you start.** Safari does
       not move focus to links and buttons unless it is enabled, under System

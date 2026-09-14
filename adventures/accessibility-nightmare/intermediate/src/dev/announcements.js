@@ -1,5 +1,5 @@
 // Development tool. Renders a live log of what a screen reader would announce,
-// beside the storefront. Switched on by adding ?listen to the URL, and stripped
+// below the storefront. Switched on by adding ?listen to the URL, and stripped
 // from production builds entirely.
 //
 // It is a simulation built from the accessibility tree, not NVDA, JAWS or
@@ -12,21 +12,24 @@
 
 const POLL_MS = 200;
 
-// The panel floats over the page rather than reserving space beside it.
-// Reserving space meant a narrow window, an editor preview pane or a phone
-// ended up with a few dozen pixels left for the storefront itself.
-// pointer-events: none keeps every click going through to the page underneath.
+// A strip across the bottom, not a rail down the side. A side rail either
+// covered the page or squeezed it: at a narrow width the storefront lost its
+// header and nav entirely. Taking height instead leaves the layout at its full
+// width at every viewport, and the matching padding on <body> means the panel
+// never sits on top of the page either.
+const PANEL_HEIGHT = 'min(15rem, 33vh)';
+
 const PANEL_STYLE = `
     position: fixed;
-    top: 0;
+    left: 0;
     right: 0;
     bottom: 0;
+    height: ${PANEL_HEIGHT};
     z-index: 9999;
-    width: min(20rem, 38vw);
     display: flex;
     flex-direction: column;
-    pointer-events: none;
-    background: rgb(20 20 28 / 94%);
+    border-top: 1px solid #2c2c3a;
+    background: #14141c;
     color: #e8e8ef;
     font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
 `;
@@ -44,27 +47,31 @@ export async function start() {
     panel.inert = true;
     panel.style.cssText = PANEL_STYLE;
 
+    // One compact bar, so the strip spends its height on the log itself.
     const heading = document.createElement('div');
-    heading.textContent = 'What a screen reader would say';
     heading.style.cssText = `
-        padding: 0.75rem 0.9rem;
-        border-bottom: 1px solid #2c2c3a;
-        font-weight: 700;
-    `;
-
-    const note = document.createElement('div');
-    note.textContent = 'a simulation, not real assistive technology';
-    note.style.cssText = `
+        display: flex;
+        gap: 0.6rem;
+        align-items: baseline;
+        flex-wrap: wrap;
         padding: 0.5rem 0.9rem;
         border-bottom: 1px solid #2c2c3a;
-        color: #9a9aae;
     `;
+
+    const title = document.createElement('strong');
+    title.textContent = 'What a screen reader would say';
+
+    const note = document.createElement('span');
+    note.textContent = 'a simulation, not real assistive technology';
+    note.style.cssText = 'color: #9a9aae;';
+
+    heading.append(title, note);
 
     const list = document.createElement('div');
     list.style.cssText = `
         flex: 1;
         overflow-y: auto;
-        padding: 0.5rem 0.9rem 1rem;
+        padding: 0.5rem 0.9rem 0.75rem;
     `;
 
     const empty = document.createElement('p');
@@ -73,8 +80,10 @@ export async function start() {
     empty.style.cssText = 'color: #9a9aae; margin: 0.5rem 0;';
     list.append(empty);
 
-    panel.append(heading, note, list);
+    panel.append(heading, list);
     document.body.append(panel);
+    // Reserve the strip's height so the page is never hidden behind it.
+    document.body.style.paddingBottom = PANEL_HEIGHT;
 
     // Read only the application, never the panel itself.
     await virtual.start({ container: root });

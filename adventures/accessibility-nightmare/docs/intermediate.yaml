@@ -155,6 +155,10 @@ how_to_play:
       http://localhost:5173/#/product/running-shoes
       ```
 
+      Open it in a browser tab rather than the editor's built-in preview. The
+      preview cannot load a private forwarded port, and you will want a real
+      browser for this level anyway.
+
       **On a Mac, turn keyboard navigation on before you start.** Safari does
       not move focus to links and buttons unless it is enabled, under System
       Settings, Keyboard, Keyboard navigation. Without it Tab appears to do

@@ -33,7 +33,7 @@
   "portsAttributes": {
     "5173": {
       "label": "ShopSmart",
-      "onAutoForward": "openPreview"
+      "onAutoForward": "notify"
     }
   },
   "otherPortsAttributes": {

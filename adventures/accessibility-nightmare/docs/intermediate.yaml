@@ -155,6 +155,10 @@ how_to_play:
       http://localhost:5173/#/product/running-shoes
       ```
 
+      **Open it in a real browser tab, not the editor's built-in preview.** This
+      level is worked almost entirely from the keyboard, and the embedded
+      preview intercepts Tab and Escape before the page ever sees them.
+
       Buying something takes two pages: choose a size and add to basket there,
       then go on to /#/checkout to place the order.
 

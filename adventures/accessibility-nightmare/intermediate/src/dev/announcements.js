@@ -11,18 +11,22 @@
 // cannot reach it: a tool that changed the tab order would be measuring itself.
 
 const POLL_MS = 200;
-const PANEL_WIDTH = '22rem';
 
+// The panel floats over the page rather than reserving space beside it.
+// Reserving space meant a narrow window, an editor preview pane or a phone
+// ended up with a few dozen pixels left for the storefront itself.
+// pointer-events: none keeps every click going through to the page underneath.
 const PANEL_STYLE = `
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     z-index: 9999;
-    width: ${PANEL_WIDTH};
+    width: min(20rem, 38vw);
     display: flex;
     flex-direction: column;
-    background: #14141c;
+    pointer-events: none;
+    background: rgb(20 20 28 / 94%);
     color: #e8e8ef;
     font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
 `;
@@ -71,7 +75,6 @@ export async function start() {
 
     panel.append(heading, note, list);
     document.body.append(panel);
-    document.body.style.paddingRight = PANEL_WIDTH;
 
     // Read only the application, never the panel itself.
     await virtual.start({ container: root });

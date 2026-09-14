@@ -113,7 +113,7 @@ architecture:
     is understanding what those libraries do for you. verify.sh checks that the
     dependency list is unchanged.
 
-architecture_diagram: ""
+architecture_diagram: "accessibility-nightmare-intermediate.svg"
 
 toolbox:
   - name: "Guidepup Virtual Screen Reader"

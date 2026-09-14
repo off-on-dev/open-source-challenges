@@ -39,7 +39,7 @@ check_npm_dependencies \
   "package.json" \
   "$EXPECTED_DEPENDENCIES" \
   "The checkout is built by hand, with no new dependencies" \
-  "Radix, React Aria and the rest solve the panel and the picker in a single import, which is the right call on real work and the wrong one here. Put the dependency list back and build the behaviour yourself."
+  "The dependency list is fixed for this level. If you reached for a headless UI library, that is the right call on real work and the wrong one here, because the exercise is understanding what it does for you. If you added something unrelated, it still has to come back out so everyone is solving the same problem."
 
 check_playwright_tests \
   "@scan" \

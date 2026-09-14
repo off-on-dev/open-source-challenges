@@ -52,14 +52,24 @@ check_npm_dependencies() {
   if [[ "$actual" == "$expected" ]]; then
     print_success_indent "$display_name"
     TESTS_PASSED=$((TESTS_PASSED + 1))
-  else
-    print_error_indent "$display_name"
-    print_info_indent "expected: $expected"
-    print_info_indent "found:    $actual"
-    print_hint "$hint"
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-    FAILED_CHECKS+=("npm_dependencies")
+    print_new_line
+    return
   fi
+
+  print_error_indent "$display_name"
+
+  # Report the difference rather than the whole list, so the message is about
+  # what the player actually did.
+  local added removed
+  added=$(comm -13 <(tr ' ' '\n' <<<"$expected" | sort) <(tr ' ' '\n' <<<"$actual" | sort) | tr '\n' ' ')
+  removed=$(comm -23 <(tr ' ' '\n' <<<"$expected" | sort) <(tr ' ' '\n' <<<"$actual" | sort) | tr '\n' ' ')
+
+  [[ -n "${added// }" ]] && print_info_indent "added:   ${added% }"
+  [[ -n "${removed// }" ]] && print_info_indent "removed: ${removed% }"
+
+  print_hint "$hint"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+  FAILED_CHECKS+=("npm_dependencies")
 
   print_new_line
 }

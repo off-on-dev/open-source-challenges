@@ -96,20 +96,19 @@ toolbox:
 
 services:
   - name: "ShopSmart"
-    url: "http://localhost:5173"
+    port: 5173
     description: "The intentionally inaccessible React storefront."
 
 how_to_play:
   - id: start
     title: "Start ShopSmart"
     content: |
-      Start the application:
+      The storefront is already running. Open the **Ports** tab in the editor,
+      find **ShopSmart** on port 5173, and click the globe icon to open it in a
+      browser tab. Codespaces serves it from an address ending in
+      `.app.github.dev`, so there is no localhost to visit.
 
-      ```bash
-      make app
-      ```
-
-      Then open port 5173 in your browser.
+      If it is not running, start it from the level directory with `make app`.
 
   - id: explore
     title: "Explore the Broken Storefront"

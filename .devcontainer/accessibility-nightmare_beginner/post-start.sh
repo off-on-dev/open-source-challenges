@@ -12,7 +12,11 @@ LOG_FILE="/tmp/accessibility-nightmare-vite.log"
 
 if ! pgrep -f "vite --host 0.0.0.0" >/dev/null 2>&1; then
   echo "✨ Starting ShopSmart on port 5173"
-  nohup npm run dev </dev/null >"$LOG_FILE" 2>&1 &
+  # setsid puts the server in its own session. A plain `nohup ... &` is killed
+  # when the Codespaces lifecycle command's process group is torn down, which
+  # leaves the port dead a moment after this script reports success.
+  setsid nohup npm run dev </dev/null >"$LOG_FILE" 2>&1 &
+  disown 2>/dev/null || true
 fi
 
 for _ in {1..30}; do

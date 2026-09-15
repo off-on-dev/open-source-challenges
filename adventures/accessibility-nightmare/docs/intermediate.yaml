@@ -1,0 +1,271 @@
+level: intermediate
+emoji: "🟡"
+title: "The Checkout Trap"
+devcontainer: accessibility-nightmare_intermediate
+community_url: "" # TODO: add community thread URL once the adventure is live
+
+topics:
+  - axe-core
+  - Playwright
+  - Guidepup Virtual Screen Reader
+  - WCAG 2.2
+  - React
+
+contributor:
+  name: "Sinduri Guntupalli"
+  url: "https://sinduri.lol/"
+  about: >-
+    Experienced in product and program management, web development, configuration management,
+    web analytics, SEO, and community and ecosystem management. Passionate about open source
+    with active involvement in the Drupal community.
+
+meta_description: >-
+  Repair a React checkout that passes every automated accessibility scan and still cannot be used.
+  Focus management across a modal, the ARIA combobox pattern, and live-region error announcement,
+  verified with Playwright and a virtual screen reader.
+
+summary: >-
+  Repair the shared checkout components so keyboard and screen reader users can
+  complete a purchase, on a page where the automated scanner already reports no
+  violations.
+
+audience: >-
+  Frontend developers who have run an accessibility scanner before and fixed
+  what it reported. Comfortable with React state, effects and refs, and ready
+  for the faults that no scanner will hand them.
+
+backstory:
+  - >-
+    The homepage is fixed and every automated scan comes back green, so the team
+    declared the problem solved.
+  - >-
+    The complaints kept arriving, and support has traced all of them to the
+    checkout. One customer adds a pair of shoes to their basket, and the
+    confirmation that appears never receives the keyboard. Their next Tab lands
+    somewhere behind it, on the page it is covering, and they carry on through
+    controls they can no longer see.
+  - >-
+    Another fills in the delivery details, submits, and is told nothing at all:
+    the error sits on screen in red, and their screen reader never mentions it.
+  - >-
+    The design team keeps shipping these same patterns, and nobody can see the
+    problem, because the scanner insists there isn't one. Fix the checkout
+    before the next batch of complaints reaches legal.
+
+objective:
+  - >-
+    Complete the checkout end to end using only the keyboard.
+  - >-
+    Have every step of that journey announced to a screen reader, including why
+    a submission was rejected.
+  - >-
+    Rebuild the size picker as a select-only combobox, so it exposes a role, a
+    name and the size that is chosen.
+  - >-
+    Keep the axe-core scan reporting no violations throughout.
+
+what_you_learn:
+  - >-
+    How to move, hold and restore focus across a modal boundary, and why hiding
+    the background is not the same as putting it out of reach.
+    ([Dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/))
+  - >-
+    How to build a control that reports its own role, name, value and state,
+    following the
+    [select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/).
+  - >-
+    How a validation failure actually reaches a screen reader user, through
+    [live regions](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions)
+    and
+    the attributes that bind a message to its field.
+  - >-
+    Why an automated scan can report a clean page that no keyboard or screen
+    reader user can operate.
+    ([Understanding WCAG 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value))
+
+architecture:
+  - >-
+    A React and Vite storefront runs on port 5173 inside the Dev Container. The
+    homepage arrives with the beginner level's repairs already applied. The
+    product page and the checkout do not.
+  - >-
+    Buying something takes two pages. On /#/product/running-shoes you choose a
+    size and add the item to your basket, which opens a confirmation. From there
+    /#/checkout collects the delivery details and places the order.
+  - >-
+    Three components carry the faults, and all three are what you edit:
+    src/components/SizePicker.jsx, src/components/BasketDialog.jsx and
+    src/components/CheckoutForm.jsx. The pages that host them,
+    src/pages/Product.jsx and src/pages/Checkout.jsx, are yours to change too.
+  - >-
+    Playwright drives the browser with real key presses and runs the
+    [Guidepup Virtual Screen Reader](https://github.com/guidepup/virtual-screen-reader)
+    inside the page, reading back the log of what a screen reader would
+    announce. axe-core scans the same page and should stay silent from start to
+    finish.
+  - >-
+    Leave tests/ and verify.sh alone. They define the required outcomes and
+    should not be weakened or bypassed.
+  - >-
+    Do not add dependencies. Radix, React Aria and their equivalents solve the
+    panel and the picker in a single import, and reaching for a maintained
+    library is the right call on real work. The ban exists because the exercise
+    is understanding what those libraries do for you. verify.sh checks that the
+    dependency list is unchanged.
+
+architecture_diagram: "accessibility-nightmare-intermediate.svg"
+
+toolbox:
+  - name: "Guidepup Virtual Screen Reader"
+    url: "https://github.com/guidepup/virtual-screen-reader"
+    description: >-
+      Produces a text log of what a screen reader would announce. It is a
+      simulation built from the accessibility tree, not NVDA, JAWS or VoiceOver,
+      and it will not reproduce the differences between them. Passing it means
+      the accessibility tree says the right thing, which is necessary but not
+      sufficient. Test with a real screen reader on real work.
+  - name: "Playwright"
+    url: "https://playwright.dev/"
+    description: "Drives real Tab, Escape and arrow presses and reports where focus actually lands."
+  - name: "axe-core"
+    url: "https://github.com/dequelabs/axe-core"
+    description: "The automated scanner that reports this page as clean, before and after."
+  - name: "ARIA Authoring Practices Guide"
+    url: "https://www.w3.org/WAI/ARIA/apg/patterns/"
+    description: "The reference implementations for the dialog and combobox patterns."
+
+services:
+  - name: "ShopSmart"
+    port: 5173
+    description: "The storefront. The product page is at /#/product/running-shoes and the checkout at /#/checkout."
+
+how_to_play:
+  - id: start
+    title: "Start ShopSmart"
+    content: |
+      The storefront is already running. Open the **Ports** tab in the editor,
+      find **ShopSmart** on port 5173, and click the globe icon to open it in a
+      browser tab. Codespaces serves it from an address ending in
+      `.app.github.dev`, so there is no localhost to visit.
+
+      If it is not running, start it from the level directory with `make app`.
+
+      Add the product route to whatever address the Ports tab gave you:
+
+      ```text
+      <your-codespace>-5173.app.github.dev/#/product/running-shoes
+      ```
+
+      Use a browser tab rather than the editor's built-in preview. The preview
+      cannot load the forwarded port while it is private, because the request is
+      sent through GitHub's authentication and a preview pane has no way to
+      complete that.
+
+      If you would rather work inside the preview, make the port public first:
+      in the Ports panel, right-click ShopSmart, choose Port Visibility, then
+      Public, and reload the preview. A public port can be reached by anyone who
+      has the URL, so turn it back to Private when you are finished.
+
+      **On a Mac, turn keyboard navigation on before you start.** Safari does
+      not move focus to links and buttons unless it is enabled, under System
+      Settings, Keyboard, Keyboard navigation. Without it Tab appears to do
+      nothing at all here, which looks exactly like a broken page. Chrome and
+      Firefox have it on already.
+
+      Buying something takes two pages: choose a size and add to basket there,
+      then go on to /#/checkout to place the order.
+
+  - id: explore
+    title: "Explore the Broken Checkout"
+    content: |
+      Run the checks first, and notice which one passes:
+
+      ```bash
+      npm run test:a11y
+      ```
+
+      The axe-core scan is green. It was green before you arrived and it has to
+      stay green, so it will not be telling you what to fix.
+
+      Then put the mouse away. From the product page, press Tab and keep
+      pressing it. Try to choose a size. Add the item to your basket and see
+      where the keyboard goes when the confirmation appears, where it goes next,
+      and what happens when you press Escape. Then go on to the checkout and
+      submit the form empty.
+
+      To watch it live while you work, add `?listen` to the end of whatever is
+      in your address bar. It works either side of the route:
+
+      ```text
+      <your-codespace>-5173.app.github.dev/#/product/running-shoes?listen
+      ```
+
+      Or to print the same journey in the terminal:
+
+      ```bash
+      npm run listen
+      ```
+
+      That walks the same journey and prints the announcements, naming any step
+      that changed the page without telling anyone about it. It grades nothing.
+      Use it as often as you like, and run it again after each repair to see
+      what changed.
+
+  - id: implement
+    title: "Repair the Checkout"
+    content: |
+      Take them smallest first. The checkout form is a handful of attributes and
+      two elements, the basket confirmation is a known pattern, and the size
+      picker is a component to build. Doing them in that order gets you three
+      separate wins before the long one.
+
+      Work in:
+
+      ```text
+      src/components/CheckoutForm.jsx
+      src/components/BasketDialog.jsx   with src/pages/Product.jsx
+      src/components/SizePicker.jsx
+      ```
+
+      One thing is worth knowing before you start, because it costs hours and
+      teaches nothing: **a live region that appears at the same moment as its
+      text will never announce.** The element has to already be in the document,
+      empty, with its content filled in later. This is a React rendering
+      question rather than an accessibility one.
+
+      Everything else is the exercise. Do not add dependencies, and do not
+      weaken the tests.
+
+      `npm run listen` is there throughout, and costs nothing to run.
+
+      When you are ready:
+
+      ```bash
+      ./verify.sh
+      ```
+
+  - id: reflect
+    title: "Ask What the Scan Measured"
+    content: |
+      The axe-core scan reported no violations before you started and reports
+      none now. Nothing you fixed was ever visible to it.
+
+      What did the scan actually measure, and what would you have to add to
+      catch any of this automatically? That question is the expert level.
+
+helpful_links:
+  - title: "ARIA Authoring Practices: Dialog (Modal)"
+    url: "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/"
+    description: "The keyboard and focus contract a modal is expected to keep."
+  - title: "ARIA Authoring Practices: Select-Only Combobox"
+    url: "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/"
+    description: "A worked listbox popup with no editable text input, which is the picker you need."
+  - title: "Understanding WCAG 4.1.3: Status Messages"
+    url: "https://www.w3.org/WAI/WCAG22/Understanding/status-messages"
+    description: "Why a message that appears without moving focus has to be announced some other way."
+  - title: "Understanding WCAG 2.1.2: No Keyboard Trap"
+    url: "https://www.w3.org/WAI/WCAG22/Understanding/no-keyboard-trap"
+    description: "Holding the keyboard inside a modal is only acceptable when there is a way out."
+  - title: "Using ARIA: live regions"
+    url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions"
+    description: "How assistive technology decides that new text is worth announcing."

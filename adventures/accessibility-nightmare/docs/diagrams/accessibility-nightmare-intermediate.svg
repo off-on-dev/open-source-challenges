@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 660" width="1120" height="660"
+     role="img" aria-labelledby="title desc">
+  <title id="title">The Checkout Trap: the purchase journey and the three layers that check it</title>
+  <desc id="desc">Buying something spans three surfaces. The product page holds the size
+    picker, adding to basket opens a confirmation dialog, and the checkout page holds the
+    delivery form. Each carries one fault: the picker exposes no role, name or value; the
+    confirmation never takes or holds the keyboard; the form's errors are never announced.
+    Three checks run against the same page. axe-core reports zero violations before and after
+    the repairs, because every fault is a behaviour rather than a property of the markup. A
+    Playwright keyboard walk and the Guidepup Virtual Screen Reader are what actually catch
+    them.</desc>
+
+  <style>
+    .bg    { fill: #ffffff; }
+    .card  { fill: #f7f7fb; stroke: #d8d8e2; stroke-width: 1.5; }
+    .inner { fill: #ffffff; stroke: #e8e8ef; stroke-width: 1.5; }
+    .band  { fill: none; stroke: #d8d8e2; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .h     { font: 700 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #55555f;
+             letter-spacing: .08em; }
+    .t     { font: 700 16px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #2f2f3d; }
+    .f     { font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #2f2f3d; }
+    .p     { font: 400 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #55555f; }
+    .fault { font: 600 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #a4402c; }
+    .ok    { font: 600 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #1b5e20; }
+    .arrow { fill: none; stroke: #6b6b76; stroke-width: 2; }
+    .lbl   { font: 400 12px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #6b6b76; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1120" height="660"/>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+            orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b6b76"/>
+    </marker>
+  </defs>
+
+  <!-- ================= the journey ================= -->
+  <text class="h" x="40" y="38">THE PURCHASE, ONE ROUTE AT A TIME</text>
+
+  <!-- product page -->
+  <rect class="card" x="40" y="56" width="280" height="176" rx="10"/>
+  <text class="t"  x="60" y="84">Product page</text>
+  <text class="p"  x="60" y="104">/#/product/running-shoes</text>
+  <rect class="inner" x="60" y="118" width="240" height="94" rx="7"/>
+  <text class="f"     x="76" y="141">SizePicker.jsx</text>
+  <text class="fault" x="76" y="163">no role, no name, no value</text>
+  <text class="p"     x="76" y="182">Tab skips it entirely, so the</text>
+  <text class="p"     x="76" y="199">size cannot be changed at all</text>
+
+  <path class="arrow" d="M 320 144 L 412 144" marker-end="url(#a)"/>
+  <text class="lbl" x="330" y="134" font-size="11">Add to basket</text>
+
+  <!-- basket dialog -->
+  <rect class="card" x="420" y="56" width="250" height="176" rx="10"/>
+  <text class="t" x="440" y="84">Basket confirmation</text>
+  <text class="p" x="440" y="104">opens over the page</text>
+  <rect class="inner" x="440" y="118" width="210" height="94" rx="7"/>
+  <text class="f"     x="456" y="141">BasketDialog.jsx</text>
+  <text class="fault" x="456" y="163">not a dialog, loses focus</text>
+  <text class="p"     x="456" y="182">Tab walks out behind it,</text>
+  <text class="p"     x="456" y="199">Escape does nothing</text>
+
+  <path class="arrow" d="M 670 144 L 742 144" marker-end="url(#a)"/>
+  <text class="lbl" x="678" y="134" font-size="11">Checkout</text>
+
+  <!-- checkout page -->
+  <rect class="card" x="750" y="56" width="330" height="176" rx="10"/>
+  <text class="t" x="770" y="84">Checkout page</text>
+  <text class="p" x="770" y="104">/#/checkout</text>
+  <rect class="inner" x="770" y="118" width="290" height="94" rx="7"/>
+  <text class="f"     x="786" y="141">CheckoutForm.jsx</text>
+  <text class="fault" x="786" y="163">errors never announced</text>
+  <text class="p"     x="786" y="182">red text on screen, silent to</text>
+  <text class="p"     x="786" y="199">a screen reader</text>
+
+  <!-- served by -->
+  <rect class="band" x="40" y="256" width="1040" height="52" rx="9"/>
+  <text class="p" x="60" y="288">
+    React and Vite, port 5173 in the Dev Container, reached from the Ports tab
+  </text>
+  <text class="lbl" x="700" y="288">You edit these three components and the pages that host them</text>
+
+  <!-- ================= the checks ================= -->
+  <text class="h" x="40" y="360">THREE WAYS OF LOOKING AT THE SAME PAGE</text>
+
+  <rect class="card" x="40" y="378" width="188" height="96" rx="10"/>
+  <text class="f" x="60" y="410">./verify.sh</text>
+  <text class="p" x="60" y="432">runs the suite and</text>
+  <text class="p" x="60" y="449">prints a checklist</text>
+
+  <path class="arrow" d="M 228 426 L 288 426" marker-end="url(#a)"/>
+
+  <rect class="card" x="296" y="378" width="208" height="96" rx="10"/>
+  <text class="t" x="316" y="408">Playwright</text>
+  <text class="p" x="316" y="430">drives Chromium with</text>
+  <text class="p" x="316" y="447">real key presses</text>
+
+  <path class="arrow" d="M 504 426 L 560 402" marker-end="url(#a)"/>
+  <path class="arrow" d="M 504 426 L 560 470" marker-end="url(#a)"/>
+  <path class="arrow" d="M 504 426 L 560 538" marker-end="url(#a)"/>
+
+  <rect class="card" x="568" y="370" width="512" height="66" rx="10"/>
+  <text class="f"  x="588" y="396">axe-core</text>
+  <text class="ok" x="588" y="418">zero violations, before your repairs and after them</text>
+
+  <rect class="card" x="568" y="444" width="512" height="66" rx="10"/>
+  <text class="f" x="588" y="470">keyboard walk</text>
+  <text class="p" x="588" y="492">asserts where focus actually lands at each step</text>
+
+  <rect class="card" x="568" y="518" width="512" height="66" rx="10"/>
+  <text class="f" x="588" y="544">Guidepup Virtual Screen Reader</text>
+  <text class="p" x="588" y="566">reads back what would have been announced</text>
+
+  <!-- the point -->
+  <rect class="band" x="40" y="608" width="1040" height="34" rx="9"/>
+  <text class="p" x="60" y="630">
+    Every fault above is a behaviour, not a property of the markup, which is why the scanner
+    never sees one of them.
+  </text>
+</svg>

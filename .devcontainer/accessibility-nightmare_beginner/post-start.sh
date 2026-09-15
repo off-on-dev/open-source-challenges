@@ -2,7 +2,7 @@
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-CHALLENGE_DIR="$REPO_ROOT/adventures/planned/adventure-accessibility-nightmare/beginner"
+CHALLENGE_DIR="$REPO_ROOT/adventures/accessibility-nightmare/beginner"
 
 echo "✨ Starting The Accessibility Nightmare - Beginner Level"
 
@@ -33,5 +33,5 @@ if ! curl --fail --silent http://127.0.0.1:5173 >/dev/null; then
 fi
 # shellcheck disable=SC1091
 source "$REPO_ROOT/lib/scripts/tracker.sh"
-set_tracking_context "adventure-accessibility-nightmare" "beginner" "" "TODO" "TODO"
+set_tracking_context "accessibility-nightmare" "beginner" "07" "09" "2026"
 track_container_initialized

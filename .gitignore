@@ -22,8 +22,10 @@ venv/
 # Maven build artifacts
 target/
 
-# OpenTelemetry Java Agent (downloaded per-Codespace by post-create.sh)
-tools/
+# OpenTelemetry Java Agent (downloaded per-Codespace by post-create.sh).
+# Anchored: unanchored "tools/" silently swallowed a tools directory inside a
+# challenge level, and `git add -A` skipped it without a word.
+/tools/
 
 # Go build artifacts
 infra/tracker/tracker

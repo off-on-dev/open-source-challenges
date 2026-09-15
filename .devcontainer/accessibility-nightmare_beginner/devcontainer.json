@@ -1,15 +1,15 @@
 {
   "name": "♿ The Accessibility Nightmare | 🟢 Beginner (The Initial Audit)",
-  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/planned/adventure-accessibility-nightmare/beginner",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/adventures/accessibility-nightmare/beginner",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "22"
     },
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_beginner/post-create.sh",
-  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/adventure-accessibility-nightmare_beginner/post-start.sh",
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/accessibility-nightmare_beginner/post-create.sh",
+  "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/accessibility-nightmare_beginner/post-start.sh",
   "customizations": {
     "vscode": {
       "extensions": [

@@ -2,7 +2,7 @@
 # Open Ecosystem Challenges
 # ==============================================================================
 
-.PHONY: help new-adventure docs accessibility-nightmare-beginner
+.PHONY: help new-adventure docs
 
 # Default target - show help
 help:
@@ -18,7 +18,3 @@ new-adventure:
 
 docs:
 	@mkdocs serve
-
-
-accessibility-nightmare-beginner:
-	$(MAKE) -C adventures/planned/adventure-accessibility-nightmare/beginner app

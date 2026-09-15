@@ -1,0 +1,387 @@
+:root {
+    font-family:
+        Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #2f2f2f;
+    background: #f7f7fb;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+:focus-visible {
+    outline: 3px solid #0b57d0;
+    outline-offset: 2px;
+}
+
+/* Available to any element that should reach assistive technology without
+   taking up space on screen. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.page {
+    min-height: 100vh;
+}
+
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 5vw;
+    background: #ffffff;
+    border-bottom: 1px solid #e8e8ef;
+}
+
+.logo {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-right: auto;
+}
+
+.menu,
+.primary-action,
+.buy-button,
+.size-picker-trigger,
+.size-picker-option,
+.dialog-close,
+.dialog-checkout,
+.place-order {
+    cursor: pointer;
+}
+
+.menu {
+    padding: 0.5rem 0.8rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: #ececf4;
+    color: #2f2f2f;
+    font: inherit;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.25rem;
+}
+
+.nav-links a {
+    color: #4a4a55;
+    text-decoration: underline;
+}
+
+.hero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    min-height: 520px;
+    padding: 4rem 5vw;
+    background: #fff7f1;
+}
+
+.hero img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 1.25rem;
+}
+
+.eyebrow {
+    margin: 0 0 0.75rem;
+    color: #a4503a;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+h1 {
+    max-width: 12ch;
+    margin: 0;
+    font-size: clamp(2.4rem, 6vw, 4.8rem);
+    line-height: 1;
+}
+
+.hero-copy {
+    max-width: 52ch;
+    color: #55504d;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.primary-action {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.9rem 1.4rem;
+    border: 0;
+    border-radius: 0.65rem;
+    background: #a4402c;
+    color: #ffffff;
+    font: inherit;
+    font-weight: 700;
+}
+
+.products-section {
+    padding: 4rem 5vw;
+}
+
+.products-section h2 {
+    margin-top: 0;
+    font-size: 2rem;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 12px 30px rgb(20 20 40 / 8%);
+}
+
+.product-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 0.75rem;
+}
+
+.product-card p {
+    color: #55555f;
+    line-height: 1.6;
+}
+
+.buy-button {
+    margin-top: auto;
+    padding: 0.8rem 1rem;
+    border: 0;
+    border-radius: 0.6rem;
+    background: #2f2f3d;
+    color: #ffffff;
+    font-weight: 700;
+    text-align: center;
+}
+
+footer {
+    padding: 2rem 5vw;
+    color: #4f4f59;
+    text-align: center;
+}
+
+/* -------------------------------------------------------------------------
+   Product page, basket dialog and checkout
+   ------------------------------------------------------------------------- */
+
+.product-page {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    padding: 4rem 5vw;
+}
+
+.product-hero {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    border-radius: 1.25rem;
+    background: #ffffff;
+}
+
+.product-detail h1 {
+    max-width: none;
+    font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.product-copy {
+    max-width: 48ch;
+    color: #55504d;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.size-picker {
+    position: relative;
+    margin: 2rem 0;
+    max-width: 12rem;
+}
+
+.size-picker-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 700;
+}
+
+.size-picker-trigger {
+    padding: 0.7rem 0.9rem;
+    border: 1px solid #6b6b76;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    font: inherit;
+    text-align: left;
+    width: 100%;
+}
+
+.size-picker-list {
+    margin-top: 0.25rem;
+    padding: 0;
+    border: 1px solid #6b6b76;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    list-style: none;
+    overflow: hidden;
+}
+
+.size-picker-option {
+    padding: 0.55rem 0.9rem;
+}
+
+.size-picker-option:hover,
+.size-picker-option[aria-selected="true"] {
+    background: #ececf4;
+}
+
+.dialog-overlay {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    background: rgb(20 20 40 / 55%);
+}
+
+.dialog {
+    width: min(28rem, 100%);
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 1.75rem;
+    border-radius: 1rem;
+    background: #ffffff;
+}
+
+.dialog-title {
+    margin-top: 0;
+}
+
+.dialog-summary {
+    margin-top: -0.5rem;
+    color: #55555f;
+}
+
+.checkout-page {
+    max-width: 34rem;
+    padding: 4rem 5vw;
+}
+
+.checkout-page h1 {
+    max-width: none;
+    font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.checkout-summary {
+    color: #55555f;
+}
+
+.dialog-checkout {
+    display: block;
+    margin-top: 1.25rem;
+    padding: 0.8rem 1rem;
+    border-radius: 0.6rem;
+    background: #a4402c;
+    color: #ffffff;
+    font-weight: 700;
+    text-align: center;
+}
+
+.form-field {
+    margin-bottom: 1rem;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+}
+
+.form-field input {
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid #6b6b76;
+    border-radius: 0.5rem;
+    font: inherit;
+}
+
+.field-error {
+    margin: 0.35rem 0 0;
+    color: #b3261e;
+    font-size: 0.9rem;
+}
+
+.place-order {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 0;
+    border-radius: 0.6rem;
+    background: #a4402c;
+    color: #ffffff;
+    font: inherit;
+    font-weight: 700;
+}
+
+.order-confirmation {
+    margin: 1rem 0 0;
+    color: #1b5e20;
+    font-weight: 700;
+}
+
+.dialog-close {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid #6b6b76;
+    border-radius: 0.6rem;
+    background: #ffffff;
+    color: #2f2f2f;
+    font: inherit;
+}
+
+@media (max-width: 800px) {
+    .site-header {
+        flex-wrap: wrap;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .hero,
+    .product-grid,
+    .product-page {
+        grid-template-columns: 1fr;
+    }
+}

@@ -5,9 +5,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/../../../../lib/scripts/loader.sh"
+source "$SCRIPT_DIR/../../../lib/scripts/loader.sh"
 
-set_tracking_context "adventure-accessibility-nightmare" "beginner" "" "TODO" "TODO"
+set_tracking_context "accessibility-nightmare" "beginner" "07" "09" "2026"
 
 OBJECTIVE="
 - Remove all serious and critical axe-core violations from the ShopSmart homepage.
@@ -16,7 +16,7 @@ OBJECTIVE="
 - Add visible focus indicators for interactive elements.
 - Achieve a Lighthouse accessibility score of at least 95."
 
-DOCS_URL="https://offon.dev/adventures/adventure-accessibility-nightmare/levels/beginner"
+DOCS_URL="https://offon.dev/adventures/accessibility-nightmare/levels/beginner"
 
 print_header \
   'The Accessibility Nightmare' \
@@ -65,7 +65,7 @@ fi
 
 if [[ $TESTS_FAILED -gt 0 ]]; then
   track_verification_completed "failed" "$failed_checks_json"
-  print_verification_summary "adventure-accessibility-nightmare" "$DOCS_URL" "$OBJECTIVE"
+  print_verification_summary "accessibility-nightmare" "$DOCS_URL" "$OBJECTIVE"
   exit 1
 fi
 
@@ -75,4 +75,4 @@ print_header "Test Results Summary"
 print_success "✅ PASSED: All $TESTS_PASSED verification checks passed!"
 print_new_line
 
-check_submission_readiness "adventure-accessibility-nightmare" "beginner"
+check_submission_readiness "accessibility-nightmare" "beginner"

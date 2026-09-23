@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 700" width="1120" height="700"
+     role="img" aria-labelledby="title desc">
+  <title id="title">The Compliance Engine: what the gate covered, and the fault no scan could reach</title>
+  <desc id="desc">A customer moves through four pages before an order is placed: the homepage,
+    the product page, the checkout and the payment page. The compliance gate was written when
+    the homepage was the only page, and has audited nothing else since, so three of the four
+    have never been in scope. Extending the scan to all four still reports nothing, because
+    the remaining fault is not in the markup. Hash routing swaps the page without a document
+    load: React re-renders, but focus never moves and no live region fires, so the
+    accessibility tree reports no change and a screen reader user is never told the page
+    changed. Of the three testing layers, axe-core reports zero violations on all four pages
+    and a keyboard walk finds every control reachable. Only the virtual screen reader hears
+    the silence.</desc>
+
+  <style>
+    .bg    { fill: #ffffff; }
+    .card  { fill: #f7f7fb; stroke: #d8d8e2; stroke-width: 1.5; }
+    .inner { fill: #ffffff; stroke: #e8e8ef; stroke-width: 1.5; }
+    .band  { fill: none; stroke: #d8d8e2; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .gap   { fill: none; stroke: #c9a79c; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .scope { fill: #eef4fd; stroke: #b9d0f2; stroke-width: 1.5; }
+    .miss  { fill: #fdf4f1; stroke: #e2c3b9; stroke-width: 1.5; }
+    .h     { font: 700 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #55555f;
+             letter-spacing: .08em; }
+    .t     { font: 700 16px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #2f2f3d; }
+    .f     { font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #2f2f3d; }
+    .p     { font: 400 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #55555f; }
+    .fault { font: 600 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #a4402c; }
+    .ok    { font: 600 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #1b5e20; }
+    .blue  { font: 600 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #0b57d0; }
+    .arrow { fill: none; stroke: #6b6b76; stroke-width: 2; }
+    .lbl   { font: 400 12px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #6b6b76; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1120" height="700"/>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+            orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b6b76"/>
+    </marker>
+  </defs>
+
+  <!-- ================= the journey ================= -->
+  <text class="h" x="40" y="36">THE PURCHASE, FOUR ROUTES</text>
+
+  <rect class="card" x="40" y="52" width="245" height="112" rx="10"/>
+  <text class="t" x="60" y="80">Homepage</text>
+  <text class="p" x="60" y="100">/</text>
+  <text class="p" x="60" y="128">Where the gate was</text>
+  <text class="p" x="60" y="146">written, years ago</text>
+
+  <path class="arrow" d="M 285 108 L 297 108" marker-end="url(#a)"/>
+
+  <rect class="card" x="305" y="52" width="245" height="112" rx="10"/>
+  <text class="t" x="325" y="80">Product page</text>
+  <text class="p" x="325" y="100">/#/product/running-shoes</text>
+  <text class="p" x="325" y="128">Choose a size and</text>
+  <text class="p" x="325" y="146">add it to the basket</text>
+
+  <path class="arrow" d="M 550 108 L 562 108" marker-end="url(#a)"/>
+
+  <rect class="card" x="570" y="52" width="245" height="112" rx="10"/>
+  <text class="t" x="590" y="80">Checkout</text>
+  <text class="p" x="590" y="100">/#/checkout</text>
+  <text class="p" x="590" y="128">Delivery details and</text>
+  <text class="p" x="590" y="146">form validation</text>
+
+  <path class="arrow" d="M 815 108 L 827 108" marker-end="url(#a)"/>
+
+  <rect class="card" x="835" y="52" width="245" height="112" rx="10"/>
+  <text class="t" x="855" y="80">Payment</text>
+  <text class="p" x="855" y="100">/#/payment</text>
+  <text class="p" x="855" y="128">Card details, the last</text>
+  <text class="p" x="855" y="146">step before the order</text>
+
+  <!-- ================= what the gate covers ================= -->
+  <rect class="scope" x="40" y="178" width="245" height="46" rx="9"/>
+  <text class="blue" x="60" y="199">Audited on every push</text>
+  <text class="lbl"  x="60" y="216">one @scan test, always green</text>
+
+  <rect class="miss" x="305" y="178" width="775" height="46" rx="9"/>
+  <text class="fault" x="325" y="199">Never audited</text>
+  <text class="lbl"   x="325" y="216">added to the flow after the gate was written; nobody widened its scope</text>
+
+  <!-- ================= the silent transition ================= -->
+  <text class="h" x="40" y="272">WHAT HAPPENS ON EVERY ROUTE CHANGE</text>
+
+  <rect class="card" x="40" y="288" width="210" height="88" rx="10"/>
+  <text class="t" x="60" y="316">A link is followed</text>
+  <text class="p" x="60" y="338">The customer moves</text>
+  <text class="p" x="60" y="356">to the next step</text>
+
+  <path class="arrow" d="M 250 332 L 288 332" marker-end="url(#a)"/>
+
+  <rect class="card" x="296" y="288" width="210" height="88" rx="10"/>
+  <text class="f" x="316" y="316">hashchange</text>
+  <text class="p" x="316" y="338">The address changes,</text>
+  <text class="p" x="316" y="356">the document does not</text>
+
+  <path class="arrow" d="M 506 332 L 544 332" marker-end="url(#a)"/>
+
+  <rect class="card" x="552" y="288" width="210" height="88" rx="10"/>
+  <text class="t" x="572" y="316">React re-renders</text>
+  <text class="p" x="572" y="338">New page on screen,</text>
+  <text class="p" x="572" y="356">pixel perfect</text>
+
+  <path class="arrow" d="M 762 332 L 800 332" marker-end="url(#a)"/>
+
+  <rect class="miss" x="808" y="288" width="272" height="88" rx="10"/>
+  <text class="fault" x="828" y="316">Nothing is announced</text>
+  <text class="p"     x="828" y="338">The screen reader has</text>
+  <text class="p"     x="828" y="356">no idea anything moved</text>
+
+  <rect class="gap" x="40" y="390" width="1040" height="42" rx="9"/>
+  <text class="p" x="60" y="416">
+    Focus never moves · no live region fires · the accessibility tree reports no change ·
+    WCAG 2.4.2 and 4.1.3
+  </text>
+
+  <!-- ================= the three layers ================= -->
+  <text class="h" x="40" y="478">THREE WAYS OF LOOKING AT THE SAME FOUR PAGES</text>
+
+  <rect class="card" x="40" y="494" width="188" height="96" rx="10"/>
+  <text class="f" x="60" y="526">./verify.sh</text>
+  <text class="p" x="60" y="548">runs the suite and</text>
+  <text class="p" x="60" y="565">prints a checklist</text>
+
+  <path class="arrow" d="M 228 542 L 288 542" marker-end="url(#a)"/>
+
+  <rect class="card" x="296" y="494" width="208" height="96" rx="10"/>
+  <text class="t" x="316" y="524">Playwright</text>
+  <text class="p" x="316" y="546">drives Chromium and</text>
+  <text class="p" x="316" y="563">listens to the page</text>
+
+  <path class="arrow" d="M 504 542 L 560 508" marker-end="url(#a)"/>
+  <path class="arrow" d="M 504 542 L 560 570" marker-end="url(#a)"/>
+  <path class="arrow" d="M 504 542 L 560 632" marker-end="url(#a)"/>
+
+  <rect class="card" x="568" y="478" width="512" height="58" rx="10"/>
+  <text class="f"  x="588" y="502">axe-core</text>
+  <text class="ok" x="588" y="522">zero violations, on all four pages, before and after the repair</text>
+
+  <rect class="card" x="568" y="544" width="512" height="58" rx="10"/>
+  <text class="f" x="588" y="568">keyboard walk</text>
+  <text class="p" x="588" y="588">every control reachable, nothing trapped, still no fault found</text>
+
+  <rect class="miss" x="568" y="610" width="512" height="58" rx="10"/>
+  <text class="f"     x="588" y="634">Guidepup Virtual Screen Reader</text>
+  <text class="fault" x="588" y="654">hears the silence — the only layer that can</text>
+
+  <!-- the point -->
+  <rect class="band" x="40" y="610" width="512" height="58" rx="9"/>
+  <text class="p" x="60" y="634">The scan was never wrong. It was answering a</text>
+  <text class="p" x="60" y="654">question nobody had checked the scope of.</text>
+</svg>

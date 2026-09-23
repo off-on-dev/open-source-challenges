@@ -89,11 +89,3 @@ overview:
   - >-
     The storefront is pre-provisioned in a Dev Container, so the work is the audit,
     the repairs and the test coverage.
-
-rewards:
-  deadline: "" # TODO: fill in once the adventure goes live
-  tiers:
-    - label: "1st place"
-      description: "Complete every published level and submit a verified solution."
-    - label: "Top 3"
-      description: "Finish the adventure with all verification checks passing."

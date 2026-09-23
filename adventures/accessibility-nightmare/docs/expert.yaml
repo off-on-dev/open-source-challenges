@@ -1,0 +1,263 @@
+level: expert
+emoji: "🔴"
+title: "The Compliance Engine"
+devcontainer: accessibility-nightmare_expert
+community_url: "" # TODO: add community thread URL once the adventure is live
+
+topics:
+  - axe-core
+  - Playwright
+  - WCAG 2.2
+  - React
+  - Screen reader testing
+
+contributor:
+  name: "Sinduri Guntupalli"
+  url: "https://sinduri.lol/"
+  about: >-
+    Experienced in product and program management, web development, configuration management,
+    web analytics, SEO, and community and ecosystem management. Passionate about open source
+    with active involvement in the Drupal community.
+
+meta_description: >-
+  Debug an accessibility compliance gate that has been green for months while blind users
+  cannot navigate the app. Extend scanner coverage, discover what automated tools cannot
+  detect, repair what it misses, and produce a report naming what was audited and what it proved.
+
+summary: >-
+  Repair the automated check that is meant to stop inaccessible code from shipping, and
+  find out why it never caught the navigation barrier the company is being audited over.
+
+audience: >-
+  Frontend developers who are comfortable with Playwright and automated accessibility scanning,
+  and who want to understand what their compliance gate is actually measuring. Assumes familiarity
+  with axe-core and the ARIA patterns from the intermediate level.
+
+backstory:
+  - >-
+    The components are repaired. The legal team needs proof of continuous compliance for the
+    EAA audit next week. Every merge passes the accessibility check, and its run history has
+    been green for months.
+  - >-
+    But one complaint in the original legal notice was never reproduced. A user reported that
+    following any link left them with no idea where they had landed — the page had changed,
+    and their screen reader carried on as though nothing had. Nobody could make the check
+    report it.
+  - >-
+    The payment page was added to the flow after the gate was written, and the checkout before
+    that. Nobody widened its scope. Its green history is not a history of the product being
+    accessible, it is a history of the same page being checked over and over.
+
+objective:
+  - >-
+    Have the gate audit every step a customer moves through, not only the homepage.
+  - >-
+    Find the navigation barrier that automated scanning has never reported.
+  - >-
+    Fix it and have the gate verify the fix holds.
+  - >-
+    Produce a report proving each customer journey step was audited and passes.
+
+what_you_learn:
+  - >-
+    Why a green accessibility gate means nothing until you know which pages and states it
+    actually tested. ([WCAG 2.4: Navigable](https://www.w3.org/WAI/WCAG22/Understanding/navigable))
+  - >-
+    Why automated scanners cannot detect faults that only exist when a user does something —
+    and which layer catches them instead.
+    ([Test and Evaluate Accessibility](https://www.w3.org/WAI/test-evaluate/))
+  - >-
+    How a single-page application can silently break the navigation contract that assistive
+    technology depends on, and what it takes to restore it.
+    ([WCAG 4.1: Compatible](https://www.w3.org/WAI/WCAG22/Understanding/compatible))
+  - >-
+    How a compliance report is evidence of conformance over time — what was tested, how
+    it was tested, and that it passed.
+
+architecture:
+  - >-
+    A React and Vite storefront runs on port 5173 inside the Dev Container. All three
+    checkout components arrive repaired: the basket confirmation is a proper modal, the size
+    picker follows the ARIA combobox pattern, and the checkout form announces its errors to
+    screen reader users.
+  - >-
+    The checkout flow has four steps: /#/ (homepage), /#/product/running-shoes (choose a
+    size), /#/checkout (delivery details), and /#/payment (card details). The compliance
+    gate was written for the first of those and has never been updated.
+  - >-
+    Routing lives in src/App.jsx, which decides what renders for each address. That file is
+    yours to change once you have found the fault. The page components under src/pages/ and
+    the repaired widgets under src/components/ are not.
+  - >-
+    Your editing surface: tests/compliance.spec.js (the gate), playwright.config.js (the
+    reporter), and src/App.jsx (the fix). Leave everything else alone — it defines the problem.
+
+architecture_diagram: "accessibility-nightmare-expert.svg"
+
+toolbox:
+  - name: "Virtual Screen Reader"
+    url: "https://github.com/guidepup/virtual-screen-reader"
+    description: >-
+      Reads the browser accessibility tree and reports what a real screen reader would
+      announce. Add ?listen to the storefront address to watch its output live, and
+      drive the same simulation from your tests via tests/lib/screen-reader.js.
+  - name: "axe-core"
+    url: "https://github.com/dequelabs/axe-core"
+    description: >-
+      The automated scanner already in the compliance gate. Structural: it checks what
+      the markup says, not what the browser announces.
+  - name: "Playwright Reporter API"
+    url: "https://playwright.dev/docs/test-reporters"
+    description: >-
+      How to route test results to a file. The JSON reporter writes a machine-readable
+      report; test.info().annotations records findings against individual tests.
+
+services:
+  - name: "ShopSmart"
+    port: 5173
+    description: "The ShopSmart storefront."
+
+how_to_play:
+  - id: browse
+    title: "Open the Store"
+    content: |
+      The storefront is already running. Open the **Ports** tab in the editor,
+      find **ShopSmart** on port 5173, and click the globe icon to open it in a
+      browser tab. Codespaces serves it from an address ending in
+      `.app.github.dev`, so there is no localhost to visit.
+
+      If it is not running, start it from the level directory with `make app`.
+
+      Add the product route to whatever address the Ports tab gave you:
+
+      ```text
+      <your-codespace>-5173.app.github.dev/#/product/running-shoes
+      ```
+
+      Use a browser tab rather than the editor's built-in preview. The preview
+      cannot load the forwarded port while it is private.
+
+      If you would rather work inside the preview, make the port public first:
+      in the Ports panel, right-click ShopSmart, choose Port Visibility, then
+      Public, and reload the preview. Turn it back to Private when you are finished.
+
+      **On a Mac, turn keyboard navigation on before you start.** Safari does
+      not move focus to links and buttons unless it is enabled, under System
+      Settings, Keyboard, Keyboard navigation.
+
+  - id: explore
+    title: "Explore the Gate"
+    content: |
+      Run the compliance gate as it stands:
+
+      ```bash
+      npm run test:a11y
+      ```
+
+      It passes. It has always passed.
+
+      Now look at what it actually does. Open `tests/compliance.spec.js` and read it.
+      Which page does it visit? Follow a customer from the homepage to the payment page
+      and count the steps the gate never sees.
+
+      Then listen to the storefront. Add `?listen` to the address to open a panel
+      showing what a screen reader would announce as you move around:
+
+      ```text
+      <your-codespace>-5173.app.github.dev/?listen
+      ```
+
+      Move through the page with Tab, then follow a link to another page. Every
+      address change is marked with a dim `·` line, so you can tell what the reader
+      said before a navigation from what it said after one.
+
+      The same simulation is available to your tests through the helpers in
+      `tests/lib/screen-reader.js`.
+
+      A coverage reference is linked in the storefront nav, at
+      `/coverage-table.html`. It records what the gate checked on its last run, and
+      which testing layer is capable of detecting each kind of fault.
+
+  - id: implement
+    title: "Repair the Gate"
+    content: |
+      Work in `tests/compliance.spec.js`, `playwright.config.js`, and `src/App.jsx`.
+
+      Start with coverage. Tag your new scanner tests `@scan` so the verify script
+      can find them. The gate should visit every page a customer passes through —
+      homepage, product, checkout, and payment.
+
+      axe-core reads the markup. If the markup is correct at every moment it looks, there is
+      nothing for it to report — which tells you where to look next, not that you are done.
+
+      Tag your navigation tests `@transition`. A detector for this moves between routes the
+      way a customer would and asserts that the destination made itself known. Assert the
+      outcome, not the mechanism.
+
+      Once you have a failing `@transition` test, fix `src/App.jsx` to make it pass.
+
+      The repair has to survive being used. Move between two different pages in a row and
+      judge both arrivals: a customer who cannot see the screen has to learn where they
+      have landed each time, without being cut off to hear it. Something that announces
+      once, or announces the same thing everywhere, is not a fix.
+
+      For each `@transition` test, use `test.info().annotations.push(...)` to attach a
+      `route-announcement` annotation recording which WCAG criterion was satisfied.
+      This is what goes into the compliance report.
+
+      Push the annotation *before* the assertion, not after it. A failed assertion
+      ends the test where it stands, so anything recorded after it never reaches the
+      report.
+
+      Finally, add a JSON reporter to `playwright.config.js` so that running
+      `npm run test:a11y` writes a `compliance-report.json` file:
+
+      ```js
+      reporter: [['list'], ['json', { outputFile: 'compliance-report.json' }]],
+      ```
+
+      When you are ready:
+
+      ```bash
+      npm run test:a11y   # generates the report
+      ./verify.sh
+      ```
+
+  - id: reflect
+    title: "Ask What the Check Covers"
+    content: |
+      The check was green for months while nobody could move through the shop without
+      sight. Two things made that possible: it never looked past the homepage, and the
+      one tool it did run was the wrong instrument for what was broken.
+
+      Every layer of a testing stack catches something the others miss, and a gate built
+      on one layer can only report the absence of the faults that layer sees. Which layer is missing
+      from the gate you rely on at work, and what would it take to add it?
+
+helpful_links:
+  - title: "Compliance Gate Coverage"
+    url: "/coverage-table.html"
+    description: >-
+      A reference table — served by the dev server — showing which checks each
+      testing layer (axe-core, keyboard, screen reader) can and cannot detect,
+      and which gate tag covers each one.
+  - title: "How to Meet WCAG 2.2 (Quick Reference)"
+    url: "https://www.w3.org/WAI/WCAG22/quickref/"
+    description: >-
+      Every success criterion, filterable by level and guideline. Your compliance report has to name the
+      ones your tests actually verify.
+  - title: "Guidepup Virtual Screen Reader"
+    url: "https://github.com/guidepup/virtual-screen-reader"
+    description: >-
+      A Playwright-compatible library that reads the browser accessibility tree
+      and reports spoken phrases the way a real screen reader would.
+  - title: "Playwright: test.info().annotations"
+    url: "https://playwright.dev/docs/api/class-testinfo#test-info-annotations"
+    description: >-
+      Attaches structured metadata to a test result. The JSON reporter includes
+      annotations in its output, making them machine-readable in the report file.
+  - title: "Playwright reporters"
+    url: "https://playwright.dev/docs/test-reporters"
+    description: >-
+      How to write test results to a file. The JSON reporter option accepts an
+      outputFile path.

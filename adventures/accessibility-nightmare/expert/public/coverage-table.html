@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coverage reference — ShopSmart</title>
+<style>
+:root {
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #2f2f2f;
+    background: #f7f7fb;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+
+a { color: inherit; text-decoration: none; }
+
+:focus-visible { outline: 3px solid #0b57d0; outline-offset: 2px; }
+
+.skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: -3rem;
+    z-index: 10;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    background: #a4402c;
+    color: #ffffff;
+    font-weight: 700;
+    transition: top 0.15s ease;
+}
+
+.skip-link:focus { top: 0.5rem; }
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skip-link { transition: none; }
+}
+
+/* ── Header ── */
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 5vw;
+    background: #ffffff;
+    border-bottom: 1px solid #e8e8ef;
+}
+
+.logo { font-size: 1.35rem; font-weight: 800; margin-right: auto; }
+
+.nav-links { display: flex; gap: 1.25rem; }
+.nav-links a { color: #4a4a55; text-decoration: underline; }
+.nav-links a[aria-current="page"] { color: #a4402c; font-weight: 700; }
+
+/* ── Page intro ── */
+.reference-page { padding: 3rem 5vw 4rem; }
+
+.eyebrow {
+    margin: 0 0 0.75rem;
+    color: #a4503a;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.85rem;
+}
+
+h1 {
+    max-width: 20ch;
+    margin: 0 0 0.75rem;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+}
+
+.intro {
+    max-width: 62ch;
+    margin: 0 0 1rem;
+    color: #55504d;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.aside {
+    max-width: 62ch;
+    margin: 0 0 1.75rem;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid #d9dfee;
+    color: #55555f;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.aside a { color: #0b57d0; text-decoration: underline; font-weight: 600; }
+
+/* ── Run summary ── */
+.run-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid #e2e2ec;
+    border-radius: 0.75rem;
+    background: #ffffff;
+}
+
+.run-figure { display: flex; align-items: baseline; gap: 0.4rem; }
+
+.run-figure b {
+    font-size: 1.5rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.run-figure span { color: #55555f; font-size: 0.9rem; }
+
+.fig-pass b { color: #1b5e20; }
+.fig-fail b { color: #b3261e; }
+.fig-skip b { color: #4f4f5b; }
+
+.fig-depth b { color: #3f3f4b; font-size: 1.15rem; }
+.fig-depth span { font-size: 0.85rem; }
+
+.run-divider {
+    width: 1px;
+    align-self: stretch;
+    min-height: 1.75rem;
+    background: #e2e2ec;
+}
+
+.run-when { margin-left: auto; color: #6a6a77; font-size: 0.85rem; }
+
+/* ── Empty state ── */
+.no-report {
+    margin: 0 0 1.25rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px dashed #c8c8d6;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #55504d;
+    line-height: 1.7;
+}
+
+.no-report h2 { margin: 0 0 0.4rem; font-size: 1.05rem; }
+.no-report p { margin: 0; }
+
+.no-report code,
+.intro code {
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    background: #f0f0f6;
+    font-size: 0.9em;
+}
+
+/* ── Legend ── */
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin: 0 0 1.25rem;
+    padding: 0;
+    border: 0;
+}
+
+.legend legend {
+    padding: 0;
+    color: #55555f;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge svg { flex-shrink: 0; }
+
+.is-yes     { color: #1b5e20; background: #e8f5e9; }
+.is-partial { color: #7a4a00; background: #fff8e1; }
+.is-no      { color: #b3261e; background: #fdecea; }
+
+/* ── Table ── */
+.table-scroll {
+    overflow-x: auto;
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgb(20 20 40 / 8%);
+}
+
+/* A scrollable region must be reachable by keyboard, so it is focusable and
+   named. Without this it fails WCAG 2.1.1 the moment the table overflows. */
+.table-scroll:focus-visible { outline: 3px solid #0b57d0; outline-offset: 2px; }
+
+/* Fixed layout so opening a disclosure grows only that row's height. With auto
+   layout the widest expanded cell re-flowed every column in the table. */
+table {
+    width: 100%;
+    min-width: 58rem;
+    border-collapse: collapse;
+    table-layout: fixed;
+    text-align: left;
+}
+
+col.c-check   { width: 26%; }
+col.c-wcag    { width: 7%; }
+col.c-layer   { width: 12%; }
+col.c-verdict { width: 31%; }
+
+caption {
+    padding: 1.25rem 1.25rem 0;
+    color: #55555f;
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+thead th {
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 2px solid #e2e2ec;
+    color: #55555f;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+th.group-heading {
+    padding: 0.7rem 1rem;
+    background: #f0f0f6;
+    border-top: 1px solid #e2e2ec;
+    border-bottom: 1px solid #e2e2ec;
+    color: #3f3f4b;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+tbody td,
+tbody th[scope="row"] {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #eeeef4;
+    vertical-align: top;
+}
+
+tbody tr:last-child td,
+tbody tr:last-child th[scope="row"] { border-bottom: 0; }
+
+th[scope="row"] { font-weight: 600; font-size: 0.95rem; color: #2f2f2f; }
+
+.check-note {
+    display: block;
+    margin-top: 0.15rem;
+    color: #6a6a77;
+    font-weight: 400;
+    font-size: 0.83rem;
+    line-height: 1.5;
+}
+
+.wcag {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.88rem;
+    color: #55555f;
+    white-space: nowrap;
+}
+
+/* ── Verified-by-gate column ── */
+.verdict { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+
+.tag {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.35rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tag-scan       { color: #0b57d0; background: #e8f0fe; }
+.tag-transition { color: #a4402c; background: #fbeae4; }
+
+.state {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 0.35rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.state-pass    { color: #1b5e20; background: #e8f5e9; }
+.state-fail    { color: #b3261e; background: #fdecea; }
+.state-none    { color: #4f4f5b; background: #ececf4; }
+.state-notrun  { color: #6a6a77; background: #f4f4f8; }
+
+.gap-why {
+    display: block;
+    margin-top: 0.3rem;
+    color: #6f5729;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+/* Informational, not a warning: a scan that covered the row without recording
+   per-rule detail is not a gap, so it must not borrow the gap colour. */
+.detail-note {
+    display: block;
+    margin-top: 0.3rem;
+    color: #55555f;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+/* ── Rule evidence ── */
+.rules { margin-top: 0.4rem; }
+
+.rules summary {
+    cursor: pointer;
+    color: #0b57d0;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.rules summary::marker { color: #8896bb; }
+
+.rule-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.rule-list li {
+    padding: 0.12rem 0.4rem;
+    border: 1px solid #e2e2ec;
+    border-radius: 0.25rem;
+    background: #f7f7fb;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    color: #4a4a55;
+}
+
+.rule-list.is-violated li {
+    border-color: #f0c2bd;
+    background: #fdecea;
+    color: #9b1c1c;
+}
+
+footer { padding: 2rem 5vw; color: #4f4f59; text-align: center; }
+
+@media (max-width: 800px) {
+    .site-header { flex-wrap: wrap; }
+    .nav-links { width: 100%; justify-content: space-between; gap: 0.75rem; }
+    .run-when { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<div class="page">
+    <header class="site-header">
+        <a class="logo" href="/">ShopSmart</a>
+        <nav class="nav-links" aria-label="Main">
+            <a href="/#/">Home</a>
+            <a href="/#/product/running-shoes">Running shoes</a>
+            <a href="/#/payment">Payment</a>
+            <a href="/coverage-table.html" aria-current="page">Coverage reference</a>
+        </nav>
+    </header>
+
+    <main class="reference-page" id="main">
+        <p class="eyebrow">Expert level · The Compliance Engine</p>
+        <h1>Conformance coverage</h1>
+        <p class="intro">
+            Every fault class this storefront can be audited for, which testing layer is
+            capable of detecting it, and whether the compliance gate actually verified it on
+            its last run. The final column is read from <code>compliance-report.json</code>.
+        </p>
+
+        <p class="aside">
+            To hear the screen reader column for yourself, open the storefront at
+            <a href="/?listen">/?listen</a> and watch the panel while you move between pages.
+            That panel runs on the storefront, not on this page.
+        </p>
+
+        <div id="summary" role="status" aria-live="polite"></div>
+
+        <fieldset class="legend">
+            <legend>Layer key</legend>
+            <span class="badge is-yes" id="lk-yes"></span>
+            <span class="badge is-partial" id="lk-partial"></span>
+            <span class="badge is-no" id="lk-no"></span>
+        </fieldset>
+
+        <div class="table-scroll" role="region" aria-label="Conformance coverage table" tabindex="0">
+            <table>
+                <caption>
+                    Fault classes grouped by the testing layer capable of detecting them.
+                </caption>
+                <colgroup>
+                    <col class="c-check">
+                    <col class="c-wcag">
+                    <col class="c-layer">
+                    <col class="c-layer">
+                    <col class="c-layer">
+                    <col class="c-verdict">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th scope="col">Accessibility check</th>
+                        <th scope="col">WCAG</th>
+                        <th scope="col">axe-core</th>
+                        <th scope="col">Keyboard</th>
+                        <th scope="col">Screen reader</th>
+                        <th scope="col">Verified by gate</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 ShopSmart</p>
+    </footer>
+</div>
+
+<script>
+const ICON = {
+    yes: '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    partial: '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.6" stroke="currentColor" stroke-width="1.5"/><path d="M3.4 6h5.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    no: '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+};
+
+// Seen text stays terse so the columns stay narrow; the spoken text is the full
+// sentence, because "No" on its own tells a screen reader user nothing.
+const LAYER_LABEL = {
+    yes: { seen: 'Detects', spoken: 'Detects this' },
+    partial: { seen: 'Partial', spoken: 'Detects this only partially' },
+    no: { seen: 'No', spoken: 'Does not detect this' },
+};
+
+const esc = (s) =>
+    String(s).replace(/[&<>"]/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c],
+    );
+
+document.getElementById('lk-yes').innerHTML = ICON.yes + 'Detects';
+document.getElementById('lk-partial').innerHTML = ICON.partial + 'Partial';
+document.getElementById('lk-no').innerHTML = ICON.no + 'Does not detect';
+
+function layerCell(level) {
+    const { seen, spoken } = LAYER_LABEL[level];
+    return (
+        `<span class="badge is-${level}">${ICON[level]}` +
+        `<span aria-hidden="true">${seen}</span>` +
+        `<span class="visually-hidden">${spoken}</span></span>`
+    );
+}
+
+// Fault classes. `rules` names the axe rule ids that satisfy the row; `annotation`
+// names the report annotation that satisfies it. A row with neither is outside
+// the automated gate for this level.
+const CHECKS = [
+    {
+        group: 'Structural markup — what the scanner reads from the DOM',
+        rows: [
+            { check: 'Accessible names on interactive elements', note: 'Buttons, links and icon controls', wcag: '4.1.2', axe: 'yes', kbd: 'no', sr: 'yes', rules: ['button-name', 'link-name', 'aria-input-field-name', 'nested-interactive'] },
+            { check: 'Valid ARIA roles and attributes', note: 'No invalid values, no orphaned attributes', wcag: '4.1.2', axe: 'yes', kbd: 'no', sr: 'no', rules: ['aria-allowed-attr', 'aria-conditional-attr', 'aria-deprecated-role', 'aria-hidden-body', 'aria-prohibited-attr', 'aria-required-attr', 'aria-roles', 'aria-valid-attr', 'aria-valid-attr-value', 'duplicate-id-aria'] },
+            { check: 'Form inputs have associated labels', note: 'for/id pairing or aria-labelledby', wcag: '1.3.1', axe: 'yes', kbd: 'no', sr: 'yes', rules: ['label', 'form-field-multiple-labels'] },
+            { check: 'Images have descriptive alt text', note: 'Or alt="" when the image is decorative', wcag: '1.1.1', axe: 'yes', kbd: 'no', sr: 'yes', rules: ['image-alt'] },
+            { check: 'Text contrast meets 4.5 : 1', note: '3 : 1 for large text and UI components', wcag: '1.4.3', axe: 'yes', kbd: 'no', sr: 'no', rules: ['color-contrast'] },
+            { check: 'The document has a title', note: 'A title exists in the markup', wcag: '2.4.2', axe: 'yes', kbd: 'no', sr: 'yes', rules: ['document-title'] },
+            { check: 'A skip mechanism bypasses repeated blocks', note: 'A skip link, or landmark structure to navigate by', wcag: '2.4.1', axe: 'yes', kbd: 'partial', sr: 'yes', rules: ['bypass'] },
+            { check: 'Interactive targets meet minimum size', note: 'WCAG 2.2 — 24 by 24 CSS pixels', wcag: '2.5.8', axe: 'yes', kbd: 'no', sr: 'no', rules: ['target-size'] },
+            { check: 'Text can be resized without loss', note: 'The viewport does not lock zoom', wcag: '1.4.4', axe: 'yes', kbd: 'no', sr: 'no', rules: ['meta-viewport'] },
+            { check: 'Document language is declared', note: 'The lang attribute on the html element', wcag: '3.1.1', axe: 'yes', kbd: 'no', sr: 'no', rules: ['html-has-lang', 'html-lang-valid'] },
+            { check: 'Heading levels are not skipped', note: 'h1 to h2 to h3, no jumps', wcag: '1.3.1', axe: 'yes', kbd: 'no', sr: 'no', rules: ['heading-order'], outOfScope: true, gap: 'axe tags heading-order as best-practice, not WCAG, so the gate’s tag filter never loads it.' },
+        ],
+    },
+    {
+        group: 'Keyboard behaviour — what driving Tab through the page reveals',
+        rows: [
+            { check: 'Every interactive control is Tab-reachable', note: 'Nothing skipped by keyboard-only users', wcag: '2.1.1', axe: 'partial', kbd: 'yes', sr: 'no' },
+            { check: 'Tab key can always leave a component', note: 'No script intercepts keydown and traps focus', wcag: '2.1.2', axe: 'no', kbd: 'yes', sr: 'no' },
+            { check: 'Tab order matches visual reading order', note: 'CSS order and grid-area do not move DOM position', wcag: '2.4.3', axe: 'no', kbd: 'yes', sr: 'partial' },
+            { check: 'Focus indicator is visible', note: 'outline: none is not applied globally', wcag: '2.4.7', axe: 'partial', kbd: 'yes', sr: 'no' },
+        ],
+    },
+    {
+        group: 'Assistive technology output — what the screen reader hears',
+        rows: [
+            { check: 'Content that changes without a page load is announced', note: 'Anything the user did not type that alters what is on screen', wcag: '4.1.3', axe: 'no', kbd: 'no', sr: 'yes', annotation: 'route-announcement' },
+            { check: 'Status messages use the right politeness', note: 'Polite by default, assertive only when genuinely urgent', wcag: '4.1.3', axe: 'no', kbd: 'no', sr: 'yes' },
+            { check: 'Form errors are announced on submission', note: 'A live region, or focus moved to an error summary', wcag: '4.1.3', axe: 'partial', kbd: 'no', sr: 'yes' },
+            { check: 'Widget state changes are announced', note: 'Dropdowns, dialogs and toggles report their state', wcag: '4.1.2', axe: 'partial', kbd: 'no', sr: 'yes' },
+        ],
+    },
+];
+
+function collectSpecs(node, out = []) {
+    if (!node || typeof node !== 'object') return out;
+    if (Array.isArray(node)) {
+        node.forEach((n) => collectSpecs(n, out));
+        return out;
+    }
+    if (Array.isArray(node.specs)) out.push(...node.specs);
+    if (Array.isArray(node.suites)) collectSpecs(node.suites, out);
+    return out;
+}
+
+// Playwright repeats annotations at both spec and test level, so collect once.
+function annotationsFor(spec) {
+    const seen = new Set();
+    const found = [];
+    const visit = (n) => {
+        if (!n || typeof n !== 'object') return;
+        if (Array.isArray(n)) return n.forEach(visit);
+        if (Array.isArray(n.annotations)) {
+            for (const a of n.annotations) {
+                const key = `${a?.type}|${a?.description}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                found.push(a);
+            }
+        }
+        Object.values(n).forEach((v) => {
+            if (v && typeof v === 'object') visit(v);
+        });
+    };
+    visit(spec);
+    return found;
+}
+
+// Reduces the report into the two things a row needs: which axe rules ran (and
+// which of them failed), and which annotated checks ran (and whether they held).
+function summarise(report) {
+    const specs = collectSpecs(report.suites);
+    const evaluated = new Map(); // rule id -> Set of page names
+    const violated = new Set();
+    const byAnnotation = new Map(); // type -> { total, failed }
+    let pass = 0, fail = 0, skip = 0, rules = 0, nodes = 0;
+    // The scan's own outcome, used when a run records no per-rule detail.
+    let scanTotal = 0, scanFailed = 0;
+
+    for (const spec of specs) {
+        // spec.ok is the outcome after retries; results[0] is only the
+        // first attempt, so a flaky-then-passing test would read as failed.
+        const attempts = spec.tests?.[0]?.results ?? [];
+        const status = attempts[attempts.length - 1]?.status ?? 'skipped';
+        const ok = spec.ok ?? (status === 'passed');
+        if (ok) pass++;
+        else if (status === 'skipped') skip++;
+        else fail++;
+
+        if (/@scan\b/.test(spec.title)) {
+            scanTotal++;
+            if (!ok) scanFailed++;
+        }
+
+        const pageName = spec.title.replace(/@\w+\s*/, '').replace(/\s*passes the accessibility scan/, '').trim();
+
+        for (const a of annotationsFor(spec)) {
+            if (!a?.description) continue;
+
+            if (a.type === 'rules-evaluated') {
+                for (const id of a.description.split(',').map((s) => s.trim()).filter(Boolean)) {
+                    if (!evaluated.has(id)) evaluated.set(id, new Set());
+                    evaluated.get(id).add(pageName);
+                }
+            } else if (a.type === 'rules-violated') {
+                a.description.split(',').map((s) => s.trim()).filter(Boolean).forEach((id) => violated.add(id));
+            } else if (a.type === 'structural-scan') {
+                const r = a.description.match(/(\d+)\s+rules evaluated/);
+                const n = a.description.match(/across\s+(\d+)\s+nodes/);
+                if (r) rules += Number(r[1]);
+                if (n) nodes += Number(n[1]);
+            } else {
+                const entry = byAnnotation.get(a.type) ?? { total: 0, failed: 0 };
+                entry.total++;
+                if (!ok) entry.failed++;
+                byAnnotation.set(a.type, entry);
+            }
+        }
+    }
+
+    return { pass, fail, skip, rules, nodes, evaluated, violated, byAnnotation,
+             scanTotal, scanFailed, startTime: report.stats?.startTime };
+}
+
+function verdictFor(row, data) {
+    if (!data) {
+        return { html: '<span class="state state-notrun">Not run</span>' };
+    }
+
+    if (row.rules) {
+        const ran = row.rules.filter((id) => data.evaluated.has(id));
+
+        if (ran.length === 0) {
+            // A run that records no per-rule detail still tells us whether the
+            // scan passed, and these rules are inside the scan's tag scope — so
+            // report the scan's own result rather than claiming nothing ran.
+            // Rows flagged outOfScope are the exception: no scan reaches them.
+            if (!row.outOfScope && data.scanTotal > 0) {
+                const state = data.scanFailed
+                    ? '<span class="state state-fail">Failed</span>'
+                    : '<span class="state state-pass">Passed</span>';
+                return {
+                    html:
+                        `<div class="verdict"><span class="tag tag-scan">@scan</span>` +
+                        `<span class="visually-hidden">tagged tests, result:</span>${state}</div>` +
+                        `<span class="detail-note">Covered by the scan. No per-rule detail recorded.</span>`,
+                };
+            }
+            return {
+                html: `<span class="state state-none">Not covered</span>` +
+                      (row.gap ? `<span class="gap-why">${esc(row.gap)}</span>` : ''),
+            };
+        }
+        const broke = ran.filter((id) => data.violated.has(id));
+        const state = broke.length
+            ? '<span class="state state-fail">Failed</span>'
+            : '<span class="state state-pass">Passed</span>';
+        const pages = new Set();
+        ran.forEach((id) => data.evaluated.get(id).forEach((p) => pages.add(p)));
+        const list = broke.length ? broke : ran;
+        return {
+            html:
+                `<div class="verdict"><span class="tag tag-scan">@scan</span><span class="visually-hidden">tagged tests, result:</span>${state}</div>` +
+                `<details class="rules">
+                    <summary>${ran.length} of ${row.rules.length} rules ran on ${pages.size} pages</summary>
+                    <ul class="rule-list${broke.length ? ' is-violated' : ''}">
+                        ${list.map((id) => `<li>${esc(id)}</li>`).join('')}
+                    </ul>
+                </details>`,
+        };
+    }
+
+    if (row.annotation) {
+        const entry = data.byAnnotation.get(row.annotation);
+        if (!entry) return { html: '<span class="state state-none">Not covered</span>' };
+        const state = entry.failed
+            ? '<span class="state state-fail">Failed</span>'
+            : '<span class="state state-pass">Passed</span>';
+        return {
+            html:
+                `<div class="verdict"><span class="tag tag-transition">@transition</span><span class="visually-hidden">tagged tests, result:</span>${state}</div>` +
+                `<details class="rules"><summary>${entry.total} ${entry.total === 1 ? 'check' : 'checks'}</summary>
+                    <ul class="rule-list"><li>${esc(row.annotation)}</li></ul>
+                </details>`,
+        };
+    }
+
+    return { html: '<span class="state state-none">Not covered</span>' };
+}
+
+function renderTable(data) {
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+
+    for (const group of CHECKS) {
+        const head = document.createElement('tr');
+        head.innerHTML = `<th class="group-heading" colspan="6" scope="rowgroup">${esc(group.group)}</th>`;
+        tbody.append(head);
+
+        for (const row of group.rows) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <th scope="row">${esc(row.check)}<span class="check-note">${esc(row.note)}</span></th>
+                <td><span class="wcag">${esc(row.wcag)}</span></td>
+                <td>${layerCell(row.axe)}</td>
+                <td>${layerCell(row.kbd)}</td>
+                <td>${layerCell(row.sr)}</td>
+                <td>${verdictFor(row, data).html}</td>`;
+            tbody.append(tr);
+        }
+    }
+}
+
+function renderSummary(data) {
+    const mount = document.getElementById('summary');
+    if (!data) {
+        mount.innerHTML = `
+            <div class="no-report">
+                <h2>No compliance report yet</h2>
+                <p>Run <code>npm run test:a11y</code> to generate one. If the run completes but
+                nothing appears here, check that a JSON reporter is configured in
+                <code>playwright.config.js</code>.</p>
+            </div>`;
+        return;
+    }
+
+    const depth = data.rules
+        ? `<span class="run-divider"></span>
+           <span class="run-figure fig-depth"><b>${data.rules}</b> <span>rules evaluated</span></span>
+           <span class="run-figure fig-depth"><b>${data.nodes}</b> <span>node checks</span></span>`
+        : '';
+
+    const when = data.startTime
+        ? `<span class="run-when">Run at ${esc(new Date(data.startTime).toLocaleString())}</span>`
+        : '';
+
+    mount.innerHTML = `
+        <div class="run-summary">
+            <span class="run-figure fig-pass"><b>${data.pass}</b> <span>passed</span></span>
+            <span class="run-figure fig-fail"><b>${data.fail}</b> <span>failed</span></span>
+            <span class="run-figure fig-skip"><b>${data.skip}</b> <span>skipped</span></span>
+            ${depth}
+            ${when}
+        </div>`;
+}
+
+fetch('/compliance-report.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : Promise.reject(new Error('missing'))))
+    .then((report) => {
+        if (report && report.error) throw new Error(report.error);
+        const data = summarise(report);
+        renderSummary(data);
+        renderTable(data);
+    })
+    .catch(() => {
+        renderSummary(null);
+        renderTable(null);
+    });
+</script>
+
+</body>
+</html>
